@@ -275,8 +275,10 @@ const items = computed<NavigationMenuItem[]>(() => [{
                             </UButton>
                         </div>
                     </div>
+
+                    <!-- Terminal Section -->
                     <div class="relative order-first lg:order-last">
-                        <div class="rounded-xl sm:rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-4 sm:p-6 lg:p-8 shadow-2xl overflow-x-auto">
+                        <div class="rounded-xl sm:rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 p-4 sm:p-6 lg:p-8 shadow-2xl overflow-x-auto w-xs sm:w-auto">
                             <div class="mb-3 sm:mb-4 flex items-center gap-2">
                                 <div class="flex gap-1 sm:gap-1.5">
                                     <div class="h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-red-500"></div>
@@ -293,7 +295,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
                                 <div class="mt-3 sm:mt-4 text-gray-400"># Start developing</div>
                                 <div class="text-purple-400">php artisan serve</div>
                                 <div class="text-purple-400">bun run dev</div>
-                                <div class="mt-4 sm:mt-6 rounded-lg bg-gray-950 p-3 sm:p-4">
+                                <div class="mt-4 sm:mt-6 rounded-lg bg-gray-950 p-3 sm:p-4 w-fit ">
                                     <div class="text-yellow-400">🚀 Server running on http://localhost:8000</div>
                                     <div class="text-cyan-400">⚡ Vite dev server running on http://localhost:5173</div>
                                 </div>
@@ -303,6 +305,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
                             Free Forever
                         </div>
                     </div>
+
                 </div>
             </UContainer>
         </section>
