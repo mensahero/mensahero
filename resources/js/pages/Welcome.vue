@@ -86,7 +86,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
                             @click="router.visit(route('register'))"
                         >
                             <UIcon name="i-heroicons-rocket-launch" class="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-                            <span class="text-sm sm:text-base">Start Free Trial</span>
+                            <span class="text-sm sm:text-base">Start Free</span>
                         </UButton>
                         <UButton
                             size="lg"
@@ -253,7 +253,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
                                 </span>
                             </li>
                         </ul>
-                        <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
+                        <div class="flex gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
                             <UButton
                                 size="lg"
                                 class="w-full sm:w-auto bg-gray-900 text-white hover:bg-gray-800 dark:bg-gray-700 dark:hover:bg-gray-600"
@@ -291,7 +291,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
                                 <div class="text-gray-400"># Clone the repository</div>
                                 <div class="text-green-400">git clone https://github.com/mensahero/mensahero-gateway.git</div>
                                 <div class="mt-3 sm:mt-4 text-gray-400"># Install dependencies</div>
-                                <div class="text-blue-400">composer install && npm install</div>
+                                <div class="text-blue-400">composer install && bun install</div>
                                 <div class="mt-3 sm:mt-4 text-gray-400"># Start developing</div>
                                 <div class="text-purple-400">php artisan serve</div>
                                 <div class="text-purple-400">bun run dev</div>
