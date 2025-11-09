@@ -2,6 +2,7 @@
 import { router } from '@inertiajs/vue3'
 import { computed } from 'vue'
 import type { NavigationMenuItem } from '@nuxt/ui'
+import LogoWithName from '@/components/LogoWithName.vue'
 
 const items = computed<NavigationMenuItem[]>(() => [{
     label: 'Login',
@@ -24,10 +25,7 @@ const items = computed<NavigationMenuItem[]>(() => [{
         <!-- Navigation Header -->
         <UHeader mode="drawer" class="border-b border-gray-200 bg-white/95 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/95 sticky top-0 z-50">
             <template #title>
-                <div class="flex items-center gap-2 sm:gap-3">
-                    <Logo class="h-8 w-8 sm:h-10 sm:w-10" />
-                    <span class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Mensahero</span>
-                </div>
+                <LogoWithName />
             </template>
 
             <template #right>
@@ -65,9 +63,9 @@ const items = computed<NavigationMenuItem[]>(() => [{
                     </UBadge>
 
                     <h1 class="mb-4 sm:mb-6 text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-extrabold tracking-tight text-gray-900 dark:text-white">
-                        <span class="block leading-tight">Empowering Communication,</span>
+                        <span class="block leading-tight font-poppins">Empowering Communication,</span>
                         <span class="mt-1 sm:mt-2 block leading-tight">
-                            <span class="bg-gradient-to-r from-red-600 via-red-500 to-yellow-500 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">
+                            <span class="font-poppins bg-gradient-to-r from-red-600 via-red-500 to-yellow-500 bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">
                                 One Message at a Time
                             </span>
                         </span>

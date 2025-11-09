@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import Logo from '@/components/Logo.vue'
 import UPasswordInput from '@/components/ui/UPasswordInput.vue'
 import Layout from '@/layouts/auth.vue'
 import { Head, useForm } from '@inertiajs/vue3'
@@ -35,8 +34,8 @@ const onSubmit = () => {
         <div class="w-full max-w-sm space-y-6">
             <!--  START:  Header Section        -->
             <div class="flex flex-col text-center">
-                <div class="mb-2">
-                    <Logo class="inline-block size-8 shrink-0" />
+                <div class="mb-4 flex justify-center">
+                    <LogoWithName/>
                 </div>
 
                 <div class="text-xl font-semibold text-pretty text-highlighted">Create an account</div>
