@@ -6,14 +6,14 @@ test('welcome screen can be rendered', function (): void {
     visit('/')
         ->assertNoConsoleLogs()
         ->assertNoJavaScriptErrors()
-        ->assertSee('Thanks for using Starter Kit!')
+        ->assertSee('Mensahero is completely open-source and free to use.')
         ->assertSee('Login')
-        ->assertSee('Register');
+        ->assertSee('Get Started');
 });
 
 test('guests can browse to register page from welcome page', function (): void {
     visit(route('home'))
-        ->click('Register')
+        ->click('Get Started')
         ->assertUrlIs(route('register'))
         ->assertNoConsoleLogs()
         ->assertNoJavaScriptErrors()

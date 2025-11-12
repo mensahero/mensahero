@@ -141,7 +141,7 @@
             "php artisan test --testsuite=Feature --bail"
         ],
 
-        "test:Api": [
+        "test:api": [
             "php artisan test --testsuite=Api --bail"
         ],
 

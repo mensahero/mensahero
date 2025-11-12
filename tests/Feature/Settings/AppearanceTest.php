@@ -27,7 +27,7 @@ test('user will have an default theme and colors', function (): void {
             ->component('settings/Appearance')
             ->has('theme', fn (Assert $page): Assert => $page
                 ->where('mode', 'system')
-                ->where('primary', 'green')
+                ->where('primary', 'brand-red')
                 ->where('neutral', 'slate'))
         );
     $this->assertDatabaseEmpty('appearances');
