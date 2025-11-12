@@ -2,8 +2,10 @@
 
 namespace App\Actions\User;
 
+use App\Mail\Users\UserDeletedMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class DeleteUser
 {
@@ -12,6 +14,8 @@ class DeleteUser
         $user = $request->user();
 
         Auth::logout();
+
+        Mail::to($user)->queue(new UserDeletedMail($user));
 
         $user->delete();
 
