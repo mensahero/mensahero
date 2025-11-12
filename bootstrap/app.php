@@ -68,7 +68,7 @@ return Application::configure(basePath: dirname(__DIR__))
                         'error'    => [
                             'statusCode'    => $response->getStatusCode(),
                             'statusMessage' => Response::$statusTexts[$response->getStatusCode()],
-                            'message'       => $exception->getMessage() ?? $exception->getPrevious()->getMessage(),
+                            'message'       => $response->getStatusCode() === 404 ? 'Oops! The page you are looking for does not exist.' : 'Something went wrong, please try again later.',
                         ],
                     ])
                         ->toResponse($request)
