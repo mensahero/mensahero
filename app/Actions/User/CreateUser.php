@@ -2,10 +2,12 @@
 
 namespace App\Actions\User;
 
+use App\Mail\Users\WelcomeMail;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 class CreateUser
@@ -26,6 +28,8 @@ class CreateUser
             }
 
             // you can add more logic here, like adding roles, etc.
+
+            Mail::to($user)->queue(new WelcomeMail($user));
 
             return $user;
         });
