@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Throwable;
 
 class CreateUser
@@ -20,6 +21,7 @@ class CreateUser
         return DB::transaction(function () use ($attributes) {
             $user = User::create([
                 ...$attributes,
+                'name'     => Str::ucwords($attributes['name']),
                 'password' => (Hash::make($attributes['password'])),
             ]);
 
