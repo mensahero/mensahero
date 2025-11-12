@@ -36,6 +36,7 @@ const appearanceConfig = ref({
 const neutralColors = ['slate', 'gray', 'zinc', 'neutral', 'stone']
 const colorsToOmit = ['inherit', 'current', 'transparent', 'black', 'white', ...neutralColors]
 const primaryColors = Object.keys(omit(colors, colorsToOmit as any))
+primaryColors.push('brand-red')
 
 const modes: {
     label: 'light' | 'dark' | 'system'
@@ -129,7 +130,7 @@ watch(
                             v-for="color in primaryColors"
                             size="xl"
                             :key="color"
-                            :label="color"
+                            :label="color === 'brand-red' ? 'Mensahero' : color"
                             :chip="color"
                             :selected="primary === color"
                             @click="primary = color"
