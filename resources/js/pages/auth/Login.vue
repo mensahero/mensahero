@@ -5,19 +5,24 @@ import Layout from '@/layouts/auth.vue'
 import { Notification } from '@/types/notification'
 import { router } from '@inertiajs/vue3'
 import type { FormSubmitEvent } from '@nuxt/ui'
-import { onMounted, reactive, watch } from 'vue'
+import { onMounted, reactive, ref, watch } from 'vue'
+import { route } from 'ziggy-js'
 
 defineOptions({ layout: Layout })
 
 const props = defineProps<{
     canResetPassword: boolean
     canRegister: boolean
+    canLoginViaGoogle: boolean
+    canLoginViaZoho: boolean
+    canLoginViaZoom: boolean
     notification: Notification | null
 }>()
 
 const toast = useToast()
 const { updateAppearance } = useAppearance()
 const { primaryColor, neutralColor, updateUi } = useColorUi()
+const providerSso = ref<object[]>([])
 
 const fields = reactive([
     {
@@ -43,6 +48,36 @@ const fields = reactive([
         type: 'checkbox' as const,
     },
 ])
+
+onMounted(() => {
+    if (props.canLoginViaGoogle) {
+        providerSso.value.push({
+            label: 'Login with Google',
+            icon: 'i-simple-icons:google',
+            onClick: () => {
+                router.visit(route('sso', 'google'))
+            },
+        })
+    }
+    if (props.canLoginViaZoho) {
+        providerSso.value.push({
+            label: 'Login with Zoho',
+            icon: 'i-simple-icons:zoho',
+            onClick: () => {
+                router.visit(route('sso', 'zoho'))
+            },
+        })
+    }
+    if (props.canLoginViaZoom) {
+        providerSso.value.push({
+            label: 'Login with Zoom',
+            icon: 'i-simple-icons:zoom',
+            onClick: () => {
+                router.visit(route('sso', 'zoom'))
+            },
+        })
+    }
+})
 
 function onSubmit(payload: FormSubmitEvent<any>) {
     fields.forEach((field) => {
@@ -108,6 +143,7 @@ onMounted(() => {
         icon="i-heroicons-rocket-launch"
         :fields="fields"
         :submit="{ label: 'Login' }"
+        :providers="providerSso"
         @submit="onSubmit"
     >
         <template #leading>
@@ -117,7 +153,9 @@ onMounted(() => {
         </template>
         <template #footer v-if="props.canRegister">
             Don't have an account?
-            <ULink :to="route('register', {}, false)" target="_self" class="font-medium text-primary">Sign up</ULink>.
+            <ULink :to="route('register', {}, false)" target="_self" class="font-medium text-primary"
+                >Sign up with Email</ULink
+            >.
         </template>
         <template #password-hint v-if="props.canResetPassword">
             <ULink

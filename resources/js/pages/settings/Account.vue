@@ -8,6 +8,7 @@ import { onMounted, ref, watch } from 'vue'
 defineOptions({ layout: Layout })
 
 interface Props {
+    deletePasswordRequired: boolean
     mustVerifyEmail: boolean
     notification: Notification | null
 }
@@ -116,7 +117,7 @@ const onSubmit = () => {
                 />
             </UForm>
 
-            <DeleteUser class="w-5/12 pt-16" />
+            <DeleteUser :deletePasswordRequired="props.deletePasswordRequired" class="w-5/12 pt-16" />
         </div>
     </AppLayout>
 </template>

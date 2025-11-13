@@ -20,7 +20,7 @@ class UpdateApiUserToken
     {
 
         /** @var PersonalAccessToken $sanctum */
-        $sanctum = PersonalAccessToken::where('refresh_token', $request->refresh_token)
+        $sanctum = PersonalAccessToken::query()->where('refresh_token', $request->refresh_token)
             ->where('tokenable_id', $request->user()->id)->first();
 
         if (! $sanctum || ! $sanctum->exists()) {

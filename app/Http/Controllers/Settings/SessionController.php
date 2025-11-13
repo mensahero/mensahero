@@ -7,6 +7,7 @@ use App\Actions\Sessions\DeleteUserSessions;
 use App\Actions\Sessions\RetrieveApiUserSession;
 use App\Actions\Sessions\RetrieveWebUserSession;
 use App\Http\Controllers\Controller;
+use App\Http\Middleware\RoutePasswordProtectedMiddleware;
 use App\Services\InertiaNotification;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
@@ -19,7 +20,6 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Actions\ConfirmPassword;
-use Laravel\Fortify\Features;
 
 class SessionController extends Controller implements HasMiddleware
 {
@@ -33,9 +33,7 @@ class SessionController extends Controller implements HasMiddleware
 
     public static function middleware()
     {
-        return Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword')
-            ? [new Middleware('password.confirm', only: ['edit'])]
-            : [];
+        return [new Middleware(RoutePasswordProtectedMiddleware::class, only: ['edit'])];
     }
 
     public function edit(Request $request): Response

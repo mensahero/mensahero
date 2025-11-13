@@ -20,7 +20,7 @@ const handleLogout = () => {
             onSuccess: () => {
                 updateAppearance('system')
                 // reset app ui colors
-                updateUi('green', 'slate')
+                updateUi('brand-red', 'slate')
                 // flush
                 router.flushAll()
             },
