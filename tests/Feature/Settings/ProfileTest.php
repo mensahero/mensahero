@@ -67,6 +67,24 @@ test('it can delete their own account', function (): void {
     $this->assertNull($user->fresh());
 });
 
+test('it doesnt requires password when deleting their own account if account is created via SSO and didnt reset password', function (): void {
+    $user = User::factory()->create([
+        'password' => null,
+    ]);
+
+    $response = $this
+        ->actingAs($user)
+        ->from(route('settings.account.edit'))
+        ->delete(route('settings.account.destroy'));
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('home'));
+
+    $this->assertGuest();
+    $this->assertNull($user->fresh());
+});
+
 test('it requires password confirmation when deleting their own account', function (): void {
     $user = User::factory()->create();
 
