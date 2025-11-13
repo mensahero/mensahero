@@ -5,6 +5,7 @@ namespace App\Actions\User;
 use App\Mail\Users\WelcomeMail;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
@@ -22,7 +23,7 @@ class CreateUser
             $user = User::query()->create([
                 ...$attributes,
                 'name'     => Str::ucwords($attributes['name']),
-                'password' => (Hash::make($attributes['password'])),
+                'password' => Arr::has($attributes, 'password') ? Hash::make($attributes['password']) : null,
             ]);
 
             if ($user instanceof MustVerifyEmail) {

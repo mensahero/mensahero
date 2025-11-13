@@ -23,7 +23,8 @@ class AccountController extends Controller
     public function edit(Request $request): Response
     {
         return Inertia::render('settings/Account', [
-            'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
+            'deletePasswordRequired' => filled($request->user()->password),
+            'mustVerifyEmail'        => $request->user() instanceof MustVerifyEmail,
         ]);
     }
 
@@ -57,9 +58,11 @@ class AccountController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $request->validate([
-            'current_password' => ['required', 'current_password'],
-        ]);
+        if (filled($request->user()->password)) {
+            $request->validate([
+                'current_password' => ['required', 'current_password'],
+            ]);
+        }
 
         $this->deleteUser->handle($request);
 

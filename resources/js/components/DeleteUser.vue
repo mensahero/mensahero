@@ -2,6 +2,12 @@
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 
+interface Props {
+    deletePasswordRequired: boolean
+}
+
+const props = defineProps<Props>()
+
 const show = ref(false)
 
 const form = useForm({
@@ -33,7 +39,7 @@ const onSubmit = () => {
                     enter your password to confirm you would like to permanently delete your account.
                 </template>
 
-                <template #body>
+                <template #body v-if="props.deletePasswordRequired">
                     <UForm class="w-full space-y-6" @submit.prevent="onSubmit">
                         <UFormField
                             label="Confirm Password"

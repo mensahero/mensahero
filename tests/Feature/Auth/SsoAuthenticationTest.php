@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Socialite\Contracts\Provider;
+use Laravel\Socialite\Two\User;
 
 uses(RefreshDatabase::class);
 
 test('user can authenticate using Zoho Account', function (): void {
 
-    $abstractUser = Mockery::mock(Laravel\Socialite\Two\User::class);
+    $abstractUser = Mockery::mock(User::class);
 
     $abstractUser->shouldReceive('getId')
         ->andReturn(1234567890)
@@ -19,7 +21,7 @@ test('user can authenticate using Zoho Account', function (): void {
         ->shouldReceive('getAvatar')
         ->andReturn('https://en.gravatar.com/userimage');
 
-    $provider = Mockery::mock(Laravel\Socialite\Contracts\Provider::class);
+    $provider = Mockery::mock(Provider::class);
     $provider->shouldReceive('user')
         ->andReturn($abstractUser);
 
@@ -32,7 +34,7 @@ test('user can authenticate using Zoho Account', function (): void {
 
 test('user can authenticate using Zoom Account', function (): void {
 
-    $abstractUser = Mockery::mock(Laravel\Socialite\Two\User::class);
+    $abstractUser = Mockery::mock(User::class);
 
     $abstractUser->shouldReceive('getId')
         ->andReturn(1234567890)
@@ -45,7 +47,7 @@ test('user can authenticate using Zoom Account', function (): void {
         ->shouldReceive('getAvatar')
         ->andReturn('https://en.gravatar.com/userimage');
 
-    $provider = Mockery::mock(Laravel\Socialite\Contracts\Provider::class);
+    $provider = Mockery::mock(Provider::class);
     $provider->shouldReceive('user')
         ->andReturn($abstractUser);
 
@@ -58,7 +60,7 @@ test('user can authenticate using Zoom Account', function (): void {
 
 test('user can authenticate using Google Account', function (): void {
 
-    $abstractUser = Mockery::mock(Laravel\Socialite\Two\User::class);
+    $abstractUser = Mockery::mock(User::class);
 
     $abstractUser->shouldReceive('getId')
         ->andReturn(1234567890)
@@ -71,7 +73,7 @@ test('user can authenticate using Google Account', function (): void {
         ->shouldReceive('getAvatar')
         ->andReturn('https://en.gravatar.com/userimage');
 
-    $provider = Mockery::mock(Laravel\Socialite\Contracts\Provider::class);
+    $provider = Mockery::mock(Provider::class);
     $provider->shouldReceive('user')
         ->andReturn($abstractUser);
 
