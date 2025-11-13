@@ -18,7 +18,7 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
      */
     public static function middleware(): array
     {
-        return [new Middleware(RoutePasswordProtectedMiddleware::class, only: ['edit'])];
+        return [new Middleware(RoutePasswordProtectedMiddleware::class, only: ['show'])];
     }
 
     /**
