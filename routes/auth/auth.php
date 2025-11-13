@@ -15,6 +15,12 @@ Route::middleware('guest')->group(function (): void {
     Route::post('login', [LoginController::class, 'store'])
         ->name('login.store');
 
+    Route::get('sso/{provider}', [LoginController::class, 'ssoCreate'])
+        ->name('sso');
+
+    Route::get('sso/{provider}/callback', [LoginController::class, 'ssoStore'])
+        ->name('sso.callback');
+
     Route::get('register', [RegisterUserController::class, 'create'])
         ->name('register');
 
