@@ -12,6 +12,7 @@ on:
 
 jobs:
   ci:
+    name: Feature tests
     runs-on: ubuntu-latest
 
     steps:

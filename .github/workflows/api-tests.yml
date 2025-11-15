@@ -12,6 +12,7 @@ on:
 
 jobs:
   ci:
+    name: API tests
     runs-on: ubuntu-latest
 
     steps:
