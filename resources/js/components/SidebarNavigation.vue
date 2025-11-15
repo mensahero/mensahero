@@ -149,7 +149,7 @@ watch(
         <template #footer="{ collapsed }">
             <UPopover :arrow="true">
                 <UUser
-                    class="profile-popover-user"
+                    class="profile-popover-user w-full"
                     :name="collapsed ? undefined : user.name"
                     :description="collapsed ? undefined : user.email"
                     :avatar="{
