@@ -14,7 +14,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('mobile')->index();
             $table->string('country_code')->default('PH');
-            $table->string('source')->comment('source of the contact, if imported from devices or other.')->nullable();
+            $table->string('source')
+                ->index()
+                ->comment('source of the contact, if imported from devices or other.')
+                ->nullable();
             $table->timestamps();
         });
     }

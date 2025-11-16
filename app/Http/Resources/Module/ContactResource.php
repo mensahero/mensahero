@@ -6,6 +6,7 @@ use App\Http\Resources\Api\Auth\SessionUserResource;
 use App\Models\Contacts;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Override;
 
 /** @mixin Contacts */
 class ContactResource extends JsonResource
@@ -15,6 +16,7 @@ class ContactResource extends JsonResource
      *
      * @return array
      */
+    #[Override]
     public function toArray(Request $request): array
     {
         return [

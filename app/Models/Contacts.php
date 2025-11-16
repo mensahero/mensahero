@@ -24,6 +24,9 @@ class Contacts extends Model
         'source',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

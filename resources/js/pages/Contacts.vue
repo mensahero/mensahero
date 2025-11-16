@@ -3,7 +3,7 @@ import Layout from '@/layouts/default.vue'
 import { IModelResource, IModelResourceData } from '@/types/modelResource'
 import { Head, router } from '@inertiajs/vue3'
 import type { TableColumn } from '@nuxt/ui'
-import type { Row } from '@tanstack/vue-table'
+import { getPaginationRowModel, type Row } from '@tanstack/table-core'
 import { useClipboard } from '@vueuse/core'
 import { upperFirst } from 'scule'
 import { h, onMounted, ref, resolveComponent, useTemplateRef, watch } from 'vue'
@@ -37,6 +37,8 @@ interface IContactResource extends IModelResource {
 
 const props = defineProps<{
     contacts?: IContactResource
+    sourceTypes?: string[]
+    countryCodes?: string[]
 }>()
 
 const toast = useToast()
@@ -45,6 +47,10 @@ const contactResources = ref<undefined | IContactResource>(props.contacts)
 const { copy } = useClipboard()
 const table = useTemplateRef('table')
 const rowSelection = ref({ 1: true })
+const pagination = ref({
+    pageIndex: 0,
+    pageSize: 10,
+})
 
 const UButton = resolveComponent('UButton')
 const UCheckbox = resolveComponent('UCheckbox')
@@ -72,25 +78,25 @@ const getRowItems = (row: Row<IContact>) => {
             label: 'Actions',
         },
         {
-            label: 'Copy payment ID',
+            label: 'Copy Mobile',
             onSelect() {
-                copy(row.original.id)
+                copy(row.original.mobile)
 
                 toast.add({
-                    title: 'Payment ID copied to clipboard!',
+                    title: 'Mobile copied to clipboard!',
                     color: 'success',
                     icon: 'i-lucide-circle-check',
                 })
             },
         },
         {
+            label: 'Send SMS',
+        },
+        {
             type: 'separator',
         },
         {
-            label: 'View customer',
-        },
-        {
-            label: 'View payment details',
+            label: 'Delete Contact',
         },
     ]
 }
@@ -150,7 +156,8 @@ const columns: TableColumn<IContact>[] = [
     {
         accessorKey: 'source',
         header: 'Source',
-        cell: ({ row }) =>  h(UBadge, { class: 'capitalize', color: 'info', variant: 'subtle' }, () => row.getValue('source') ?? 'N/A'),
+        cell: ({ row }) =>
+            h(UBadge, { class: 'capitalize', color: 'info', variant: 'subtle' }, () => row.getValue('source') ?? 'N/A'),
     },
     {
         id: 'actions',
@@ -202,7 +209,7 @@ const columns: TableColumn<IContact>[] = [
         </div>
         <div v-else>
             <div
-                v-if="props.contacts && props.contacts.data.length === 0"
+                v-if="props.contacts && props.contacts.meta.total === 0"
                 class="flex h-full flex-col items-center justify-center gap-4"
             >
                 <UEmpty
@@ -225,33 +232,95 @@ const columns: TableColumn<IContact>[] = [
             </div>
             <div v-else>
                 <div class="flex w-full flex-1 flex-col">
-                    <div class="flex justify-end px-4 py-3.5">
-                        <UDropdownMenu
-                            :items="
-                                table?.tableApi
-                                    ?.getAllColumns()
-                                    .filter((column) => column.getCanHide())
-                                    .map((column) => ({
-                                        label: upperFirst(column.columnDef.header as string),
-                                        type: 'checkbox' as const,
-                                        checked: column.getIsVisible(),
-                                        onUpdateChecked(checked: boolean) {
-                                            table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
-                                        },
-                                        onSelect(e: Event) {
-                                            e.preventDefault()
-                                        },
-                                    }))
-                            "
-                            :content="{ align: 'end' }"
-                        >
+                    <div class="flex flex-wrap items-center justify-between gap-1.5 px-1 py-2">
+                        <UInput class="max-w-sm" icon="i-lucide-search" placeholder="Filter emails or mobile..." />
+
+                        <div class="flex flex-wrap items-center gap-1.5">
                             <UButton
-                                label="Display"
-                                color="neutral"
-                                variant="outline"
-                                trailing-icon="i-lucide-settings-2"
-                            />
-                        </UDropdownMenu>
+                                v-if="table?.tableApi?.getFilteredSelectedRowModel().rows.length"
+                                label="Delete"
+                                color="error"
+                                variant="subtle"
+                                icon="i-lucide-trash"
+                            >
+                                <template #trailing>
+                                    <UKbd>
+                                        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length }}
+                                    </UKbd>
+                                </template>
+                            </UButton>
+
+                            <!--            Filters                -->
+                            <UPopover arrow>
+                                <UButton color="neutral" variant="outline" icon="i-lucide-filter" label="Filters" />
+
+                                <template #content>
+                                    <div class="h-auto w-full p-5">
+                                        <UForm class="space-y-3">
+                                            <UFormField label="Code" name="code" class="w-full">
+                                                <USelect
+                                                    :items="[
+                                                        { label: 'All', value: 'all' },
+                                                        { label: 'Subscribed', value: 'subscribed' },
+                                                        { label: 'Unsubscribed', value: 'unsubscribed' },
+                                                        { label: 'Bounced', value: 'bounced' },
+                                                    ]"
+                                                    :ui="{
+                                                        trailingIcon:
+                                                            'group-data-[state=open]:rotate-180 transition-transform duration-200',
+                                                    }"
+                                                    placeholder="Filter status"
+                                                    class="min-w-28"
+                                                />
+                                            </UFormField>
+                                            <UFormField label="Code" name="code" class="w-full">
+                                                <USelect
+                                                    :items="[
+                                                        { label: 'All', value: 'all' },
+                                                        { label: 'Subscribed', value: 'subscribed' },
+                                                        { label: 'Unsubscribed', value: 'unsubscribed' },
+                                                        { label: 'Bounced', value: 'bounced' },
+                                                    ]"
+                                                    :ui="{
+                                                        trailingIcon:
+                                                            'group-data-[state=open]:rotate-180 transition-transform duration-200',
+                                                    }"
+                                                    placeholder="Filter status"
+                                                    class="min-w-28"
+                                                />
+                                            </UFormField>
+                                        </UForm>
+                                    </div>
+                                </template>
+                            </UPopover>
+
+                            <UDropdownMenu
+                                :items="
+                                    table?.tableApi
+                                        ?.getAllColumns()
+                                        .filter((column) => column.getCanHide())
+                                        .map((column) => ({
+                                            label: upperFirst(column.columnDef.header as string),
+                                            type: 'checkbox' as const,
+                                            checked: column.getIsVisible(),
+                                            onUpdateChecked(checked: boolean) {
+                                                table?.tableApi?.getColumn(column.id)?.toggleVisibility(!!checked)
+                                            },
+                                            onSelect(e: Event) {
+                                                e.preventDefault()
+                                            },
+                                        }))
+                                "
+                                :content="{ align: 'end' }"
+                            >
+                                <UButton
+                                    label="Display"
+                                    color="neutral"
+                                    variant="outline"
+                                    trailing-icon="i-lucide-settings-2"
+                                />
+                            </UDropdownMenu>
+                        </div>
                     </div>
                     <UTable
                         ref="table"
@@ -259,6 +328,10 @@ const columns: TableColumn<IContact>[] = [
                         :loading="pageLoading"
                         v-model:column-visibility="columnVisibility"
                         v-model:row-selection="rowSelection"
+                        v-model:pagination="pagination"
+                        :pagination-options="{
+                            getPaginationRowModel: getPaginationRowModel(),
+                        }"
                         :data="contactResources?.data"
                         :columns="columns"
                         :ui="{
@@ -270,9 +343,20 @@ const columns: TableColumn<IContact>[] = [
                         }"
                     />
 
-                    <div class="border-t border-accented px-4 py-3.5 text-sm text-muted">
-                        {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
-                        {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
+                    <div class="mt-auto flex items-center justify-between gap-3 border-t border-default pt-4">
+                        <div class="text-sm text-muted">
+                            {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
+                            {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.
+                        </div>
+
+                        <div class="flex items-center gap-1.5">
+                            <UPagination
+                                :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
+                                :items-per-page="contactResources?.meta.per_page || 10"
+                                :total="contactResources?.meta.total || 0"
+                                @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
