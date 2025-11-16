@@ -194,15 +194,7 @@ const columns: TableColumn<IContact>[] = [
     <AppLayout :breadcrumbItems="breadcrumbItems">
         <Head title="Contacts" />
         <template #action>
-            <UButton
-                v-if="props.contacts && props.contacts.data.length > 0"
-                class="mr-auto"
-                color="primary"
-                icon="i-lucide-plus"
-                variant="subtle"
-                label="Add Contact"
-                @click="router.visit(route('contacts.create'))"
-            />
+            <AddContact :show="props.contacts !== undefined && props.contacts.data.length > 0" />
         </template>
         <div v-if="pageLoading">
             {{ pageLoading }}
