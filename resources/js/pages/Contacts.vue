@@ -209,18 +209,18 @@ const columns: TableColumn<IContact>[] = [
         <div v-else>
             <div
                 v-if="props.contacts && props.contacts.meta.total === 0"
-                class="flex h-full flex-col items-center justify-center gap-4"
+                class="flex h-full w-full flex-col items-center justify-center gap-4"
             >
                 <UEmpty
                     size="sm"
                     variant="naked"
-                    icon="i-lucide-users"
+                    icon="i-heroicons:user-group"
                     title="No Contacts found"
                     description="It looks like you haven't added any contact. Create one to get started."
                     :actions="[
                         {
-                            icon: 'i-lucide-plus',
-                            label: 'Create new',
+                            icon: 'i-heroicons:user-plus',
+                            label: 'Add Contact',
                             onClick: async () => {
                                 await addContactActionModal.open({
                                     show: true,

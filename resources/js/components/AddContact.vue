@@ -46,7 +46,7 @@ const onSubmit = () => {
         @update:open="() => form.resetAndClearErrors()"
         v-if="show"
     >
-        <UButton class="mr-auto" color="primary" icon="i-lucide-plus" variant="subtle" label="Add Contact" />
+        <UButton class="mr-auto" color="primary" icon="i-heroicons:user-plus" variant="subtle" label="Add Contact" />
         <template #body>
             <UForm class="flex w-full flex-row gap-3 space-y-2" @submit.prevent="onSubmit">
                 <div class="w-6/12 space-y-2">

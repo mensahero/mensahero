@@ -43,7 +43,7 @@ const sidebarNavigationItems = computed<NavigationMenuItem[][]>(() => [
         },
         {
             label: 'Contacts',
-            icon: 'i-lucide:contact-round',
+            icon: 'i-heroicons:user-group',
             to: route('contacts.create', {}, false),
             target: '_self',
         },
