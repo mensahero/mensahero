@@ -14,14 +14,21 @@ class ContactsController extends Controller
 {
     public function create(): InertiaResponse
     {
+        $perPage = request()->input('per_page', 10);
+
+        if (! in_array($perPage, [10, 25, 50, 100])) {
+            $perPage = 10;
+        }
+
         $contacts = auth()->user()->contacts()
             ->searchByQueryString()
             ->filterByQueryString()
-            ->paginate(10)
+            ->paginate($perPage)
             ->withQueryString();
 
         return Inertia::render('Contacts', [
             'contacts'      => Inertia::optional(fn () => ContactResource::collection($contacts)),
+            'contactsCount' => auth()->user()->contacts()->count(),
             'sourceTypes'   => ContactSources::cases(),
             'countryCodes'  => MobileCountryCode::cases(),
         ]);

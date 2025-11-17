@@ -32,7 +32,7 @@ const onSubmit = () => {
             // close the modal
             emit('close')
         },
-        only: ['contacts'],
+        only: ['contacts', 'contactsCount'],
     })
 }
 </script>

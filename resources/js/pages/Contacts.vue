@@ -5,9 +5,10 @@ import { IModelResource, IModelResourceData } from '@/types/modelResource'
 import { Head, router } from '@inertiajs/vue3'
 import type { TableColumn } from '@nuxt/ui'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
-import { useClipboard } from '@vueuse/core'
+import { useClipboard, watchDebounced } from '@vueuse/core'
 import { upperFirst } from 'scule'
 import { h, onMounted, ref, resolveComponent, useTemplateRef, watch } from 'vue'
+import { route } from 'ziggy-js'
 
 defineOptions({ layout: Layout })
 
@@ -38,6 +39,7 @@ interface IContactResource extends IModelResource {
 
 const props = defineProps<{
     contacts?: IContactResource
+    contactsCount: number
     sourceTypes: string[]
     countryCodes: string[]
 }>()
@@ -54,6 +56,7 @@ const pagination = ref({
     pageIndex: 0,
     pageSize: 10,
 })
+const tableSearch = ref('')
 const tableFilters = ref({
     countryCode: 'all',
     sourceType: 'all',
@@ -76,6 +79,51 @@ watch(
     () => props.contacts,
     (newContacts) => (contactResources.value = newContacts),
     { immediate: true, deep: true },
+)
+
+watch(
+    () => tableFilters,
+    (newTableFilters) => {
+        router.get(
+            route('contacts.create'),
+            {
+                per_page: pagination.value.pageSize,
+                page: pagination.value.pageIndex + 1,
+                source_type_filter: newTableFilters.value.sourceType,
+                mobile_country_code_filter: newTableFilters.value.countryCode,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['contacts'],
+            },
+        )
+    },
+    { immediate: true, deep: true },
+)
+
+watchDebounced(
+    () => tableSearch,
+    (tableSearchValue) => {
+        router.get(
+            route('contacts.create'),
+            {
+                search: tableSearchValue.value,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['contacts'],
+            },
+        )
+    },
+    {
+        deep: true,
+        debounce: 1000,
+        maxWait: 5000,
+    },
 )
 
 const getRowItems = (row: Row<IContact>) => {
@@ -202,7 +250,7 @@ const columns: TableColumn<IContact>[] = [
         <Head title="Contacts" />
         <template #action>
             <AddContact
-                :show="props.contacts !== undefined && props.contacts.meta.total > 0"
+                :show="props.contacts !== undefined && props.contactsCount > 0"
                 :countryCodes="props.countryCodes"
                 :source="props.sourceTypes"
             />
@@ -212,7 +260,7 @@ const columns: TableColumn<IContact>[] = [
         </div>
         <div v-else>
             <div
-                v-if="props.contacts && props.contacts.meta.total === 0"
+                v-if="props.contacts && props.contactsCount === 0"
                 class="flex h-full w-full flex-col items-center justify-center gap-4"
             >
                 <UEmpty
@@ -240,7 +288,7 @@ const columns: TableColumn<IContact>[] = [
                             variant: 'subtle',
                             onClick: () =>
                                 router.reload({
-                                    only: ['contacts'],
+                                    only: ['contacts', 'contactsCount'],
                                 }),
                         },
                     ]"
@@ -249,7 +297,24 @@ const columns: TableColumn<IContact>[] = [
             <div v-else>
                 <div class="flex w-full flex-1 flex-col">
                     <div class="flex flex-wrap items-center justify-between gap-1.5 px-1 py-2">
-                        <UInput class="max-w-sm" icon="i-lucide-search" placeholder="Filter emails or mobile..." />
+                        <UInput
+                            v-model="tableSearch"
+                            class="max-w-sm"
+                            :ui="{ trailing: 'pe-1' }"
+                            icon="i-lucide-search"
+                            placeholder="Search..."
+                        >
+                            <template v-if="tableSearch?.length" #trailing>
+                                <UButton
+                                    color="neutral"
+                                    variant="link"
+                                    size="sm"
+                                    icon="i-lucide-circle-x"
+                                    aria-label="Clear input"
+                                    @click="tableSearch = ''"
+                                />
+                            </template>
+                        </UInput>
 
                         <div class="flex flex-wrap items-center gap-1.5">
                             <UButton
@@ -278,10 +343,10 @@ const columns: TableColumn<IContact>[] = [
                                                     v-model="tableFilters.countryCode"
                                                     :items="[
                                                         { label: 'All', value: 'all' },
-                                                       ...props.countryCodes.map((code) => ({
-                                                           label: upperFirst(code),
+                                                        ...props.countryCodes.map((code) => ({
+                                                            label: upperFirst(code),
                                                             value: code,
-                                                           }))
+                                                        })),
                                                     ]"
                                                     :ui="{
                                                         trailingIcon:
@@ -297,9 +362,9 @@ const columns: TableColumn<IContact>[] = [
                                                     :items="[
                                                         { label: 'All', value: 'all' },
                                                         ...props.sourceTypes.map((source) => ({
-                                                           label: upperFirst(source),
+                                                            label: upperFirst(source),
                                                             value: source,
-                                                           }))
+                                                        })),
                                                     ]"
                                                     :ui="{
                                                         trailingIcon:
@@ -362,6 +427,11 @@ const columns: TableColumn<IContact>[] = [
                             td: 'border-b border-default',
                         }"
                     >
+                        <template #empty>
+                            <div class="flex h-full w-full flex-col items-center justify-center gap-4">
+                                No available contacts.
+                            </div>
+                        </template>
                     </UTable>
 
                     <div
