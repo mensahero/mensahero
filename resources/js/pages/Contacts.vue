@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import AddContact from '@/components/AddContact.vue'
 import Layout from '@/layouts/default.vue'
 import { IModelResource, IModelResourceData } from '@/types/modelResource'
 import { Head, router } from '@inertiajs/vue3'
@@ -42,10 +43,12 @@ const props = defineProps<{
 }>()
 
 const toast = useToast()
+const overlay = useOverlay()
 const pageLoading = ref(true)
 const contactResources = ref<undefined | IContactResource>(props.contacts)
 const { copy } = useClipboard()
 const table = useTemplateRef('table')
+const addContactActionModal = overlay.create(AddContact)
 const rowSelection = ref({ 1: true })
 const pagination = ref({
     pageIndex: 0,
@@ -194,7 +197,11 @@ const columns: TableColumn<IContact>[] = [
     <AppLayout :breadcrumbItems="breadcrumbItems">
         <Head title="Contacts" />
         <template #action>
-            <AddContact :show="props.contacts !== undefined && props.contacts.data.length > 0" />
+            <AddContact
+                :show="props.contacts !== undefined && props.contacts.meta.total > 0"
+                :countryCodes="props.countryCodes"
+                :source="props.sourceTypes"
+            />
         </template>
         <div v-if="pageLoading">
             {{ pageLoading }}
@@ -205,19 +212,32 @@ const columns: TableColumn<IContact>[] = [
                 class="flex h-full flex-col items-center justify-center gap-4"
             >
                 <UEmpty
-                    icon="i-lucide-file"
+                    size="sm"
+                    variant="naked"
+                    icon="i-lucide-users"
                     title="No Contacts found"
                     description="It looks like you haven't added any contact. Create one to get started."
                     :actions="[
                         {
                             icon: 'i-lucide-plus',
                             label: 'Create new',
+                            onClick: async () => {
+                                await addContactActionModal.open({
+                                    show: true,
+                                    countryCodes: countryCodes || [],
+                                    source: sourceTypes || [],
+                                }).result
+                            },
                         },
                         {
                             icon: 'i-lucide-refresh-cw',
                             label: 'Refresh',
                             color: 'neutral',
                             variant: 'subtle',
+                            onClick: () =>
+                                router.reload({
+                                    only: ['contacts'],
+                                }),
                         },
                     ]"
                 />
@@ -333,9 +353,13 @@ const columns: TableColumn<IContact>[] = [
                             th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
                             td: 'border-b border-default',
                         }"
-                    />
+                    >
+                    </UTable>
 
-                    <div class="mt-auto flex items-center justify-between gap-3 border-t border-default pt-4">
+                    <div
+                        v-if="contactResources?.meta?.total && contactResources?.meta?.total > 0"
+                        class="mt-auto flex items-center justify-between gap-3 border-t border-default pt-4"
+                    >
                         <div class="text-sm text-muted">
                             {{ table?.tableApi?.getFilteredSelectedRowModel().rows.length || 0 }} of
                             {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s) selected.

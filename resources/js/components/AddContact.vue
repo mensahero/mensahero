@@ -9,6 +9,7 @@ defineProps<{
 }>()
 
 const openModal = ref(false)
+const emit = defineEmits(['close'])
 const toast = useToast()
 const form = useForm({
     name: '',
@@ -28,6 +29,8 @@ const onSubmit = () => {
             })
             form.resetAndClearErrors()
             openModal.value = false
+            // close the modal
+            emit('close')
         },
         only: ['contacts'],
     })
@@ -41,13 +44,14 @@ const onSubmit = () => {
         description="Add a new contact to your address book"
         :ui="{ footer: 'justify-end', body: 'w-full' }"
         @update:open="() => form.resetAndClearErrors()"
+        v-if="show"
     >
         <UButton class="mr-auto" color="primary" icon="i-lucide-plus" variant="subtle" label="Add Contact" />
         <template #body>
             <UForm class="flex w-full flex-row gap-3 space-y-2" @submit.prevent="onSubmit">
                 <div class="w-6/12 space-y-2">
                     <UFormField label="Name" name="name" :error="form.errors.name" required>
-                        <UInput v-model="form.name" placeholder="Enter your name" class="w-full" />
+                        <UInput v-model="form.name" placeholder="Enter your name" class="w-full" autofocus />
                     </UFormField>
                     <UFormField label="Code" name="country_code" :error="form.errors.country_code" required>
                         <USelect
@@ -59,7 +63,7 @@ const onSubmit = () => {
                     </UFormField>
                 </div>
                 <div class="w-6/12 space-y-2">
-                    <UFormField label="Mobile Number" name="mobile" :error="form.mobile" required>
+                    <UFormField label="Mobile Number" name="mobile" :error="form.errors.mobile" required>
                         <UInput v-model="form.mobile" placeholder="Enter your mobile number" class="w-full" />
                     </UFormField>
                     <UFormField label="Source" name="source" :error="form.errors.source">
@@ -74,7 +78,17 @@ const onSubmit = () => {
             </UForm>
         </template>
         <template #footer="{ close }">
-            <UButton label="Cancel" color="neutral" variant="outline" @click="close" />
+            <UButton
+                label="Cancel"
+                color="neutral"
+                variant="outline"
+                @click="
+                    () => {
+                        close
+                        $emit('close')
+                    }
+                "
+            />
             <UButton label="Submit" @click.prevent="onSubmit" data-test="create-contact-button" />
         </template>
     </UModal>
