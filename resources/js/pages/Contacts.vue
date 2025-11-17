@@ -82,6 +82,27 @@ watch(
 )
 
 watch(
+    () => pagination,
+    (newPagination) => {
+        router.get(
+            route('contacts.create'),
+            {
+                ...route().queryParams,
+                per_page: newPagination.value.pageSize,
+                page: newPagination.value.pageIndex + 1,
+            },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                only: ['contacts'],
+            },
+        )
+    },
+    { deep: true, immediate: true },
+)
+
+watch(
     () => tableFilters,
     (newTableFilters) => {
         router.get(
@@ -444,9 +465,11 @@ const columns: TableColumn<IContact>[] = [
                         </div>
 
                         <div class="flex items-center gap-1.5">
+                            <span class="text-sm text-muted">Record per page:</span>
+                            <USelect v-model="pagination.pageSize" :items="[10, 25, 50, 100]" />
                             <UPagination
                                 :default-page="(table?.tableApi?.getState().pagination.pageIndex || 0) + 1"
-                                :items-per-page="contactResources?.meta.per_page || 10"
+                                :items-per-page="pagination.pageSize || 10"
                                 :total="contactResources?.meta.total || 0"
                                 @update:page="(p: number) => table?.tableApi?.setPageIndex(p - 1)"
                             />
