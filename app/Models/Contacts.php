@@ -6,12 +6,15 @@ use App\Concerns\ContactSources;
 use App\Concerns\MobileCountryCode;
 use App\Models\Filters\Contacts\MobileCountryCodeFilter;
 use App\Models\Filters\Contacts\SourceTypeFilter;
+use App\Models\Scopes\Contacts\UserContactsScope;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Lacodix\LaravelModelFilter\Traits\HasFilters;
 use Lacodix\LaravelModelFilter\Traits\IsSearchable;
 
+#[ScopedBy([UserContactsScope::class])]
 class Contacts extends Model
 {
     use HasFilters;
