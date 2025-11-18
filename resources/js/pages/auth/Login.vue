@@ -108,12 +108,10 @@ watch(
     (notification) => {
         if (notification) {
             toast.add({
-                title:
-                    (notification.title ?? notification.type === 'success') ? 'Success' : 'Opps! Something went wrong',
+                title: notification.title,
                 description: notification.message,
-                color: notification.type === 'success' ? 'success' : 'error',
-                icon: notification.type === 'success' ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle',
-                duration: 5000,
+                color: notification.color,
+                icon: notification.icon,
             })
         }
     },
@@ -122,14 +120,10 @@ watch(
 onMounted(() => {
     if (props.notification) {
         toast.add({
-            title:
-                (props.notification.title ?? props.notification.type === 'success')
-                    ? 'Success'
-                    : 'Opps! Something went wrong',
+            title: props.notification.title,
             description: props.notification.message,
-            color: props.notification.type === 'success' ? 'success' : 'error',
-            icon: props.notification.type === 'success' ? 'i-heroicons-check-circle' : 'i-heroicons-x-circle',
-            duration: 5000,
+            color: props.notification.color,
+            icon: props.notification.icon,
         })
     }
 })

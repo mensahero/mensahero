@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { useColorUi } from '@/composables/useColorUi'
 import { useStorage } from '@vueuse/core'
 
-const { primaryColor } = useColorUi()
 const toast = useToast()
-const toaster = { expand: false, progress: false, color: primaryColor.value, max: 3 }
+const toaster = { expand: false, progress: false, max: 4 }
 
 const cookie = useStorage('cookie-consent', 'pending')
 if (cookie.value !== 'accepted') {
