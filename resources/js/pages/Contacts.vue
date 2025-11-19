@@ -9,6 +9,7 @@ import { useClipboard, watchDebounced } from '@vueuse/core'
 import { upperFirst } from 'scule'
 import { h, onMounted, ref, resolveComponent, useTemplateRef, watch } from 'vue'
 import { route } from 'ziggy-js'
+import DeleteModal from '@/components/DeleteModal.vue'
 
 defineOptions({ layout: Layout })
 
@@ -51,6 +52,7 @@ const contactResources = ref<undefined | IContactResource>(props.contacts)
 const { copy } = useClipboard()
 const table = useTemplateRef('table')
 const addContactActionModal = overlay.create(AddContact)
+const deleteActionModal = overlay.create(DeleteModal)
 const rowSelection = ref({ 1: true })
 const pagination = ref({
     pageIndex: 0,
@@ -344,6 +346,13 @@ const columns: TableColumn<IContact>[] = [
                                 color="error"
                                 variant="subtle"
                                 icon="i-lucide-trash"
+                                @click.prevent="async () => {
+                                     await deleteActionModal.open({
+                                     onSubmit: () => {
+                                         console.log('YES')
+                                     }
+                                        }).result
+                                }"
                             >
                                 <template #trailing>
                                     <UKbd>

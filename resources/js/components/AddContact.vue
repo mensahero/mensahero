@@ -28,12 +28,16 @@ const onSubmit = () => {
                 icon: 'i-heroicons-check-circle',
             })
             form.resetAndClearErrors()
-            openModal.value = false
             // close the modal
-            emit('close')
+            closeModal()
         },
         only: ['contacts', 'contactsCount'],
     })
+}
+
+const closeModal = () => {
+    openModal.value = false
+    emit('close')
 }
 </script>
 
@@ -85,7 +89,7 @@ const onSubmit = () => {
                 @click="
                     () => {
                         close
-                        $emit('close')
+                        closeModal()
                     }
                 "
             />
