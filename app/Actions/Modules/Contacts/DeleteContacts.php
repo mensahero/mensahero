@@ -9,13 +9,13 @@ use Throwable;
 class DeleteContacts
 {
     /**
-     * @param array|string $ids
+     * @param array $ids
      *
      * @throws Throwable
      *
      * @return mixed
      */
-    public function handle(array|string $ids): mixed
+    public function handle(array $ids): mixed
     {
         return DB::transaction(fn () => Contacts::query()->whereIn('id', $ids)->delete());
     }
