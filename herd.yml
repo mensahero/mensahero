@@ -1,6 +1,6 @@
 name: mensahero-gateway
 php: '8.4'
-secured: false
+secured: true
 aliases:
     - mensahero.test
 services: {  }
