@@ -7,6 +7,6 @@ Route::middleware('auth')->prefix('contacts')->group(function (): void {
         ->name('contacts.create');
     Route::post('/', [ContactsController::class, 'store'])
         ->name('contacts.store');
-    Route::delete('/', [ContactsController::class, 'destroy'])
+    Route::post('/delete', [ContactsController::class, 'destroy'])
         ->name('contacts.destroy');
 });

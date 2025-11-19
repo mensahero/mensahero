@@ -84,5 +84,7 @@ class ContactsController extends Controller
             ->message('The contact has been deleted successfully.')
             ->send();
 
+        return to_route('contacts.create');
+
     }
 }

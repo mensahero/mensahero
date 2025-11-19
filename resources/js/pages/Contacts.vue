@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import AddContact from '@/components/AddContact.vue'
+import DeleteModal from '@/components/DeleteModal.vue'
 import Layout from '@/layouts/default.vue'
 import { IModelResource, IModelResourceData } from '@/types/modelResource'
-import { Head, router } from '@inertiajs/vue3'
+import { Head, router, useForm } from '@inertiajs/vue3'
 import type { TableColumn } from '@nuxt/ui'
 import { getPaginationRowModel, type Row } from '@tanstack/table-core'
 import { useClipboard, watchDebounced } from '@vueuse/core'
 import { upperFirst } from 'scule'
 import { h, onMounted, ref, resolveComponent, useTemplateRef, watch } from 'vue'
 import { route } from 'ziggy-js'
-import DeleteModal from '@/components/DeleteModal.vue'
 
 defineOptions({ layout: Layout })
 
@@ -53,7 +53,7 @@ const { copy } = useClipboard()
 const table = useTemplateRef('table')
 const addContactActionModal = overlay.create(AddContact)
 const deleteActionModal = overlay.create(DeleteModal)
-const rowSelection = ref({ 1: true })
+const rowSelection = ref({})
 const pagination = ref({
     pageIndex: 0,
     pageSize: 10,
@@ -346,13 +346,32 @@ const columns: TableColumn<IContact>[] = [
                                 color="error"
                                 variant="subtle"
                                 icon="i-lucide-trash"
-                                @click.prevent="async () => {
-                                     await deleteActionModal.open({
-                                     onSubmit: () => {
-                                         console.log('YES')
-                                     }
+                                @click.prevent="
+                                    async () => {
+                                        const selectedIds = table?.tableApi
+                                            .getFilteredSelectedRowModel()
+                                            .rows.map((rows) => rows.original.id)
+                                        const selectedRowsCount =
+                                            table?.tableApi.getFilteredSelectedRowModel().rows.length
+
+                                        await deleteActionModal.open({
+                                            description: `Are you sure you want to delete this ${selectedRowsCount! > 1 ? selectedRowsCount : ''} record? This action cannot be undone.`,
+                                            onSubmit: () => {
+                                                const form = useForm({
+                                                    ids: selectedIds,
+                                                })
+                                                form.post(route('contacts.destroy'), {
+                                                    onSuccess: () => {
+                                                        router.reload({
+                                                            only: ['contacts', 'contactsCount'],
+                                                        })
+                                                        rowSelection = {}
+                                                    },
+                                                })
+                                            },
                                         }).result
-                                }"
+                                    }
+                                "
                             >
                                 <template #trailing>
                                     <UKbd>

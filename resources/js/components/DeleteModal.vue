@@ -1,5 +1,4 @@
 <script setup lang="ts">
-
 defineProps<{
     title?: string
     description?: string
@@ -16,12 +15,11 @@ const closeModal = () => {
 
 <template>
     <UModal
-        :close = "{ onClick: () => closeModal() }"
-        :title = "title ?? 'Are you sure?'"
+        :close="{ onClick: () => closeModal() }"
+        :title="title ?? 'Are you sure?'"
         :description="description ?? 'Are you sure you want to delete this record? This action cannot be undone.'"
         :ui="{ footer: 'justify-end', body: 'w-full' }"
     >
-
         <template #footer="{ close }">
             <UButton
                 :label="closeLabel ?? 'Cancel'"
@@ -34,12 +32,18 @@ const closeModal = () => {
                     }
                 "
             />
-            <UButton label="Delete" color="error" @click="() => {
-                onSubmit()
-                closeModal()
-            }" data-test="modal-delete-record-button" />
+            <UButton
+                label="Delete"
+                color="error"
+                @click="
+                    () => {
+                        onSubmit()
+                        closeModal()
+                    }
+                "
+                data-test="modal-delete-record-button"
+            />
         </template>
-
     </UModal>
 </template>
 
