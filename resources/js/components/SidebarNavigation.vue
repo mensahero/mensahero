@@ -130,7 +130,9 @@ watch(
         :min-size="15"
         :default-size="15.5"
         :max-size="23"
-        :ui="{ footer: 'border-t border-default' }"
+        resizable
+        class="bg-elevated/25"
+        :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
         <template #header="{ collapsed }">
             <div v-if="!collapsed" class="flex w-full flex-row items-center justify-center">
@@ -142,8 +144,6 @@ watch(
         <template #default="{ collapsed }">
             <UNavigationMenu
                 type="single"
-                highlight
-                highlight-color="primary"
                 :collapsed="collapsed"
                 :tooltip="!!collapsed"
                 :popover="!!collapsed"
