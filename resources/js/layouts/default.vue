@@ -1,5 +1,5 @@
 <script setup lang="ts">
-const toaster = { expand: false, progress: false, max: 4 }
+const toaster = { expand: false, progress: false, max: 4, duration: 3000 }
 </script>
 
 <template>
