@@ -33,6 +33,7 @@ class ContactsController extends Controller
         }
 
         $contacts = Contacts::query()
+            ->latest()
             ->searchByQueryString()
             ->filterByQueryString()
             ->paginate($perPage)
@@ -77,6 +78,26 @@ class ContactsController extends Controller
     }
 
     /**
+     * @throws Exception
+     */
+    public function update(ContactsRequest $request, string $id): RedirectResponse
+    {
+        $contact = Contacts::query()->findOrFail($id);
+
+        $contact->update($request->validated());
+
+        $contact->save();
+
+        InertiaNotification::make()
+            ->success()
+            ->title('Contact updated')
+            ->message('The contact has been updated successfully.')
+            ->send();
+
+        return to_route('contacts.create');
+    }
+
+    /**
      * @throws Throwable
      */
     public function destroy(Request $request): RedirectResponse
@@ -97,5 +118,13 @@ class ContactsController extends Controller
 
         return to_route('contacts.create');
 
+    }
+
+    public function enums(): void
+    {
+        Inertia::merge([
+            'sourceTypes'  => ContactSources::cases(),
+            'countryCodes' => MobileCountryCode::cases(),
+        ]);
     }
 }

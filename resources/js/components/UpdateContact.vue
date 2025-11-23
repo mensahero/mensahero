@@ -1,27 +1,47 @@
 <script setup lang="ts">
 import emitter from '@/lib/emitter'
-import { useForm } from '@inertiajs/vue3'
-import { ref } from 'vue'
+import { IContact } from '@/types/contacts/contacts'
+import { router, useForm } from '@inertiajs/vue3'
+import { onMounted, reactive, ref } from 'vue'
 
-defineProps<{
-    show: boolean
-    countryCodes?: string[]
-    source?: string[]
+const props = defineProps<{
+    record: IContact
 }>()
 
 const openModal = ref(false)
 const emit = defineEmits(['close'])
 const form = useForm({
-    name: '',
-    mobile: '',
-    country_code: '',
-    source: '',
+    name: props.record.name,
+    mobile: props.record.mobile,
+    country_code: props.record.country_code,
+    source: props.record.source,
+})
+
+const selectFields = reactive<{
+    source: string[]
+    countryCodes: string[]
+}>({
+    source: [],
+    countryCodes: [],
+})
+
+onMounted(() => {
+    router.get(
+        route('contacts.enums'),
+        {},
+        {
+            onSuccess: (resp) => {
+                selectFields.source = resp.props.sourceTypes as string[]
+                selectFields.countryCodes = resp.props.countryCodes as string[]
+            },
+        },
+    )
 })
 
 const onSubmit = () => {
-    form.post(route('contacts.store'), {
+    form.put(route('contacts.update', props.record.id), {
         onSuccess: () => {
-            emitter.emit('contacts:added', true)
+            emitter.emit('contacts:updated')
             form.resetAndClearErrors()
             // close the modal
             closeModal()
@@ -38,13 +58,11 @@ const closeModal = () => {
 <template>
     <UModal
         v-model:open="openModal"
-        title="Add Contact"
-        description="Add a new contact to your address book"
+        title="Edit Contact"
+        description="Edit an existing contact in your address book"
         :ui="{ footer: 'justify-end', body: 'w-full' }"
         @update:open="() => form.resetAndClearErrors()"
-        v-if="show"
     >
-        <UButton class="mr-auto" color="primary" icon="i-heroicons:user-plus" variant="subtle" label="Add Contact" />
         <template #body>
             <UForm class="flex w-full flex-row gap-3 space-y-2" @submit.prevent="onSubmit">
                 <div class="w-6/12 space-y-2">
@@ -62,7 +80,7 @@ const closeModal = () => {
                             tabindex="3"
                             v-model="form.country_code"
                             placeholder="Select your code"
-                            :items="countryCodes || []"
+                            :items="selectFields.countryCodes"
                             class="w-full"
                         />
                     </UFormField>
@@ -81,7 +99,7 @@ const closeModal = () => {
                             v-model="form.source"
                             tabindex="4"
                             placeholder="Select source"
-                            :items="source || []"
+                            :items="selectFields.source"
                             class="w-full"
                         />
                     </UFormField>
@@ -100,7 +118,7 @@ const closeModal = () => {
                     }
                 "
             />
-            <UButton label="Submit" @click.prevent="onSubmit" data-test="create-contact-button" />
+            <UButton label="Submit" @click.prevent="onSubmit" data-test="update-contact-button" />
         </template>
     </UModal>
 </template>

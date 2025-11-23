@@ -2,6 +2,7 @@
 import AddContact from '@/components/AddContact.vue'
 import DeleteModal from '@/components/DeleteModal.vue'
 import Layout from '@/layouts/default.vue'
+import emitter from '@/lib/emitter'
 import { contactColumns } from '@/tables/columns/contacts'
 import { IContact } from '@/types/contacts/contacts'
 import { IModelResource } from '@/types/modelResource'
@@ -62,20 +63,26 @@ const columnVisibility = ref({
 const UButton = resolveComponent('UButton')
 const UDropdownMenu = resolveComponent('UDropdownMenu')
 
-const toggleDataLoading = () => {
-    isDataLoading.value = !isDataLoading.value
-}
+const InertiaBefore = router.on('before', () => (isDataLoading.value = true))
+const InertiaFinish = router.on('finish', () => (isDataLoading.value = false))
 
-const InertiaBefore = router.on('before', toggleDataLoading)
-const InertiaFinish = router.on('finish', toggleDataLoading)
+const reloadInertiaPage = () => router.reload({ only: ['contacts', 'contactsCount', 'notification'] })
 
 onMounted(() => {
-    toggleDataLoading()
+    isDataLoading.value = false
 })
 
 onUnmounted(() => {
     InertiaBefore()
     InertiaFinish()
+    emitter.all.clear()
+})
+
+emitter.on('*', (type, event) => {
+    console.log(type, event)
+    if (type.toString().includes('contacts:')) {
+        reloadInertiaPage()
+    }
 })
 
 watch(
@@ -243,9 +250,7 @@ watchDebounced(
                                             })
                                             form.post(route('contacts.destroy'), {
                                                 onSuccess: () => {
-                                                    router.reload({
-                                                        only: ['contacts', 'contactsCount'],
-                                                    })
+                                                    emitter.emit('contacts:deleted')
                                                     rowSelection = {}
                                                 },
                                             })

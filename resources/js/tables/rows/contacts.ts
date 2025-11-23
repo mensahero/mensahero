@@ -1,4 +1,5 @@
 import DeleteModal from '@/components/DeleteModal.vue'
+import UpdateContact from '@/components/UpdateContact.vue'
 import { IContact } from '@/types/contacts/contacts'
 import { router, useForm } from '@inertiajs/vue3'
 import { useToast } from '@nuxt/ui/runtime/composables/useToast.js'
@@ -8,6 +9,7 @@ import { route } from 'ziggy-js'
 
 const { copy } = useClipboard()
 const overlay = useOverlay()
+const updateContactModal = overlay.create(UpdateContact)
 const deleteActionModal = overlay.create(DeleteModal)
 
 export const contactRows = (row: Row<IContact>) => {
@@ -27,6 +29,14 @@ export const contactRows = (row: Row<IContact>) => {
                     icon: 'i-lucide-circle-check',
                     duration: 2000,
                 })
+            },
+        },
+        {
+            label: 'Edit Contact',
+            onSelect: async () => {
+                await updateContactModal.open({
+                    record: row.original,
+                }).result
             },
         },
         {
