@@ -169,3 +169,44 @@ test('contacts can be searched by name or mobile via query string', function ():
             ->where('contacts.data.0.mobile', $beta->mobile)
         );
 });
+
+test('user can update an existing contact', function (): void {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    // Create an existing contact
+    $contact = Contacts::query()->create([
+        'user_id'      => $user->id,
+        'name'         => 'Original Name',
+        'mobile'       => '+639111111111',
+        'country_code' => 'PH',
+        'source'       => 'Phone',
+    ]);
+
+    // Update the contact with new data
+    $payload = [
+        'name'         => 'Updated Name',
+        'mobile'       => '+639555555555',
+        'country_code' => 'PH',
+        'source'       => 'CRM',
+    ];
+
+    $this->put(route('contacts.update', $contact->id), $payload)
+        ->assertRedirect(route('contacts.create'));
+
+    // Verify the contact was updated
+    $this->assertDatabaseHas('contacts', [
+        'id'           => $contact->id,
+        'user_id'      => $user->id,
+        'name'         => 'Updated Name',
+        'mobile'       => '+639555555555',
+        'country_code' => 'PH',
+        'source'       => 'CRM',
+    ]);
+
+    // Verify old values are no longer present
+    $this->assertDatabaseMissing('contacts', [
+        'id'   => $contact->id,
+        'name' => 'Original Name',
+    ]);
+});

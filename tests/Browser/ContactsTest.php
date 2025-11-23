@@ -107,3 +107,32 @@ test('user can delete a contact', function (): void {
 
     expect(Contacts::query()->where('id', $contact->id)->exists())->toBeFalse();
 });
+
+test('user can update a contact through the edit modal form', function (): void {
+    $user = User::factory()->create();
+    actingAs($user);
+
+    $contact = Contacts::query()->create([
+        'user_id'      => $user->id,
+        'name'         => 'Echo Contact',
+        'mobile'       => '+639555555555',
+        'country_code' => 'PH',
+        'source'       => 'Phone',
+    ]);
+
+    visit(route('contacts.create'))
+        ->assertSee('Echo Contact')
+        ->click('@contact-actions-dropdown-trigger')
+        ->assertSee('Edit Contact')
+        ->click('Edit Contact')
+        ->assertSee('Edit an existing contact in your address book')
+        ->fill('name', 'Updated Echo Contact')
+        ->fill('mobile', '09666666666')
+        ->click('@update-contact-button')
+        ->assertSee('Updated Echo Contact')
+        ->assertNoJavaScriptErrors();
+
+    $contact->refresh();
+    expect($contact->name)->toBe('Updated Echo Contact')
+        ->and($contact->mobile)->toBe('+639666666666');
+});

@@ -58,7 +58,7 @@ class ContactsController extends Controller
 
         if (Contacts::query()->where('mobile', $formattedMobile)->exists()) {
             throw ValidationException::withMessages([
-                'mobile' => 'The mobile number has already been taken.',
+                'mobile' => 'The mobile number is already exist',
             ]);
         }
 
@@ -82,9 +82,20 @@ class ContactsController extends Controller
      */
     public function update(ContactsRequest $request, string $id): RedirectResponse
     {
+        $formattedMobile = new PhoneNumber($request->mobile, "{$request->country_code}")->formatE164();
+
+        if (Contacts::query()->where('mobile', $formattedMobile)->where('id', '!=', $id)->exists()) {
+            throw ValidationException::withMessages([
+                'mobile' => 'The mobile number is already exist.',
+            ]);
+        }
+
         $contact = Contacts::query()->findOrFail($id);
 
-        $contact->update($request->validated());
+        $contact->update([
+            ...$request->validated(),
+            'mobile' => $formattedMobile,
+        ]);
 
         $contact->save();
 

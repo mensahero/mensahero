@@ -78,8 +78,7 @@ onUnmounted(() => {
     emitter.all.clear()
 })
 
-emitter.on('*', (type, event) => {
-    console.log(type, event)
+emitter.on('*', (type) => {
     if (type.toString().includes('contacts:')) {
         reloadInertiaPage()
     }
