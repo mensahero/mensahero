@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dc2c3fd6abb12348d4f513f80553b71a",
+    "content-hash": "81b8a756d7a240dfd93e645e073b206a",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -1714,6 +1714,70 @@
                 "source": "https://github.com/JayBizzle/Crawler-Detect/tree/v1.3.6"
             },
             "time": "2025-09-30T16:22:43+00:00"
+        },
+        {
+            "name": "jurager/teams",
+            "version": "3.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Jurager/teams.git",
+                "reference": "9e2b9ab73c60a35f30a83db58d065df8efd22d2a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Jurager/teams/zipball/9e2b9ab73c60a35f30a83db58d065df8efd22d2a",
+                "reference": "9e2b9ab73c60a35f30a83db58d065df8efd22d2a",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "illuminate/bus": "^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/http": "^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/mail": "^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/queue": "^8.0|^9.0|^10.0|^11.0|^12.0",
+                "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Teams": "Jurager\\Teams\\Support\\Facades\\Teams"
+                    },
+                    "providers": [
+                        "Jurager\\Teams\\TeamsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Jurager\\Teams\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Yuri Gerassimov",
+                    "email": "jurager01@gmail.com"
+                }
+            ],
+            "description": "Laravel package to manage team functionality and operate with user permissions.",
+            "keywords": [
+                "Teams",
+                "abilities",
+                "auth",
+                "gropus",
+                "laravel",
+                "permissions"
+            ],
+            "support": {
+                "issues": "https://github.com/Jurager/teams/issues",
+                "source": "https://github.com/Jurager/teams/tree/3.0.1"
+            },
+            "time": "2025-11-18T18:32:26+00:00"
         },
         {
             "name": "lacodix/laravel-model-filter",
@@ -13251,5 +13315,5 @@
         "ext-json": "*"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
