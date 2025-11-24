@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Actions\Auth\LoginUser;
 use App\Actions\Teams\CreateCurrentSessionTeam;
+use App\Actions\Teams\CreateTeams;
 use App\Actions\User\CreateUser;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\Fortify\Features;
@@ -95,6 +97,15 @@ class LoginController extends Controller
         Auth::login($user, $request->boolean('remember'));
 
         $request->session()->regenerate();
+
+        // Create a personal team for the user and it will the default team
+        $teams = app(CreateTeams::class)->handle(
+            attribute: [
+                'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
+                'user_id' => $user->id,
+            ], markAsDefault: true);
+
+        app(CreateCurrentSessionTeam::class)->handle($teams);
 
         return redirect()->intended(route('dashboard', absolute: false));
 
