@@ -30,12 +30,14 @@
         "erag/laravel-disposable-email": "^3.7",
         "inertiajs/inertia-laravel": "^2.0",
         "jaybizzle/crawler-detect": "^1.3",
+        "lacodix/laravel-model-filter": "^3.6",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/sanctum": "^4.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.10.1",
         "mobiledetect/mobiledetectlib": "^4.8",
+        "propaganistas/laravel-phone": "^6.0",
         "scalar/laravel": "^0.2.0",
         "socialiteproviders/google": "^4.1",
         "socialiteproviders/zoho": "^4.1",
@@ -137,7 +139,6 @@
         ],
 
         "test:browser": [
-            "Composer\\Config::disableProcessTimeout",
             "php artisan test --testsuite=Browser --bail"
         ],
 
@@ -151,9 +152,10 @@
 
         "test": [
             "@php artisan config:clear --ansi",
-            "@test:browser",
+            "@test:api",
             "@test:features",
-            "@test:Api"
+            "@test:browser"
+
         ]
     },
     "scripts-descriptions": {

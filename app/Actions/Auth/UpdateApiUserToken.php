@@ -3,8 +3,8 @@
 namespace App\Actions\Auth;
 
 use App\Models\PersonalAccessToken;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Fluent;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -42,7 +42,7 @@ class UpdateApiUserToken
             'token'      => $sanctum->getKey().'|'.$plainTextToken,
             'refresh'    => $freshToken,
             'expires_at' => $expiresAt->timestamp,
-            'expires_in' => (int) ceil(Carbon::now()->diffInSeconds($expiresAt)),
+            'expires_in' => (int) ceil(Date::now()->diffInSeconds($expiresAt)),
         ]);
 
     }

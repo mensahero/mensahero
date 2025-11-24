@@ -44,6 +44,9 @@ watch(
                     <UDashboardSidebarCollapse as="button" :disabled="false" />
                     <UBreadcrumb :items="props.breadcrumbItems" />
                 </template>
+                <template #right>
+                    <slot name="action" />
+                </template>
             </UDashboardNavbar>
         </template>
 

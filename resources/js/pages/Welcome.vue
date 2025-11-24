@@ -2,8 +2,8 @@
 import LogoWithName from '@/components/LogoWithName.vue'
 import { router } from '@inertiajs/vue3'
 import type { NavigationMenuItem } from '@nuxt/ui'
-import { computed, onMounted } from 'vue'
 import { useStorage } from '@vueuse/core'
+import { computed, onMounted } from 'vue'
 
 const toast = useToast()
 
@@ -109,12 +109,12 @@ onMounted(() => {
                         >
                             <span class="block font-poppins leading-tight">Empowering Communication,</span>
                             <span class="mt-1 block leading-tight sm:mt-2">
-                            <span
-                                class="bg-gradient-to-r from-red-600 via-red-500 to-yellow-500 bg-clip-text font-poppins text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
-                            >
-                                One Message at a Time
+                                <span
+                                    class="bg-gradient-to-r from-red-600 via-red-500 to-yellow-500 bg-clip-text font-poppins text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
+                                >
+                                    One Message at a Time
+                                </span>
                             </span>
-                        </span>
                         </h1>
 
                         <p
@@ -187,7 +187,9 @@ onMounted(() => {
             <section class="bg-white py-12 sm:py-16 lg:py-24 dark:bg-gray-900">
                 <UContainer>
                     <div class="mb-10 px-4 text-center sm:mb-16 sm:px-6 lg:mb-20 lg:px-8">
-                        <h2 class="mb-3 text-2xl font-bold text-gray-900 sm:mb-4 sm:text-3xl lg:text-5xl dark:text-white">
+                        <h2
+                            class="mb-3 text-2xl font-bold text-gray-900 sm:mb-4 sm:text-3xl lg:text-5xl dark:text-white"
+                        >
                             Why Choose Mensahero?
                         </h2>
                         <p class="mx-auto max-w-2xl text-sm text-gray-600 sm:text-base lg:text-xl dark:text-gray-300">
@@ -235,8 +237,8 @@ onMounted(() => {
                                     Easy Integration
                                 </h3>
                                 <p class="text-sm text-gray-600 sm:text-base dark:text-gray-300">
-                                    Seamlessly integrate with your applications, CRMs, and automation tools. Multiple SDKs
-                                    available.
+                                    Seamlessly integrate with your applications, CRMs, and automation tools. Multiple
+                                    SDKs available.
                                 </p>
                             </div>
                         </UCard>
@@ -256,7 +258,8 @@ onMounted(() => {
                                     Secure Routing
                                 </h3>
                                 <p class="text-sm text-gray-600 sm:text-base dark:text-gray-300">
-                                    End-to-end encryption and secure message routing. Your data is protected at every step.
+                                    End-to-end encryption and secure message routing. Your data is protected at every
+                                    step.
                                 </p>
                             </div>
                         </UCard>
@@ -289,7 +292,10 @@ onMounted(() => {
                                 <div
                                     class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg shadow-purple-600/30 transition-transform group-hover:scale-110 sm:mb-4 sm:h-14 sm:w-14"
                                 >
-                                    <UIcon name="i-heroicons-arrows-right-left" class="h-6 w-6 text-white sm:h-7 sm:w-7" />
+                                    <UIcon
+                                        name="i-heroicons-arrows-right-left"
+                                        class="h-6 w-6 text-white sm:h-7 sm:w-7"
+                                    />
                                 </div>
                                 <h3
                                     class="mb-2 text-lg font-bold text-gray-900 sm:mb-3 sm:text-xl lg:text-2xl dark:text-white"
@@ -321,8 +327,8 @@ onMounted(() => {
                                     Open Source
                                 </h3>
                                 <p class="text-sm text-gray-600 sm:text-base dark:text-gray-300">
-                                    Fully transparent codebase on GitHub. Contribute, customize, and build with confidence.
-                                    No vendor lock-in.
+                                    Fully transparent codebase on GitHub. Contribute, customize, and build with
+                                    confidence. No vendor lock-in.
                                 </p>
                             </div>
                         </UCard>
@@ -350,8 +356,8 @@ onMounted(() => {
                                 Built in the Open, For Everyone
                             </h2>
                             <p class="mb-4 text-sm text-gray-600 sm:mb-6 sm:text-base lg:text-lg dark:text-gray-300">
-                                Mensahero is completely open-source and free to use. We believe in transparency, community
-                                collaboration, and empowering developers worldwide.
+                                Mensahero is completely open-source and free to use. We believe in transparency,
+                                community collaboration, and empowering developers worldwide.
                             </p>
                             <ul class="mb-6 space-y-2 sm:mb-8 sm:space-y-3">
                                 <li class="flex items-start gap-2 sm:gap-3">
@@ -360,9 +366,9 @@ onMounted(() => {
                                         class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500 sm:mt-1 sm:h-5 sm:w-5"
                                     />
                                     <span class="text-sm text-gray-600 sm:text-base dark:text-gray-300">
-                                    <strong class="text-gray-900 dark:text-white">MIT Licensed</strong> - Use it freely
-                                    for personal or commercial projects
-                                </span>
+                                        <strong class="text-gray-900 dark:text-white">MIT Licensed</strong> - Use it
+                                        freely for personal or commercial projects
+                                    </span>
                                 </li>
                                 <li class="flex items-start gap-2 sm:gap-3">
                                     <UIcon
@@ -370,9 +376,9 @@ onMounted(() => {
                                         class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500 sm:mt-1 sm:h-5 sm:w-5"
                                     />
                                     <span class="text-sm text-gray-600 sm:text-base dark:text-gray-300">
-                                    <strong class="text-gray-900 dark:text-white">Full Transparency</strong> - Every
-                                    line of code is visible and auditable
-                                </span>
+                                        <strong class="text-gray-900 dark:text-white">Full Transparency</strong> - Every
+                                        line of code is visible and auditable
+                                    </span>
                                 </li>
                                 <li class="flex items-start gap-2 sm:gap-3">
                                     <UIcon
@@ -380,9 +386,9 @@ onMounted(() => {
                                         class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500 sm:mt-1 sm:h-5 sm:w-5"
                                     />
                                     <span class="text-sm text-gray-600 sm:text-base dark:text-gray-300">
-                                    <strong class="text-gray-900 dark:text-white">Community Driven</strong> - Contribute
-                                    features, report bugs, and shape the roadmap
-                                </span>
+                                        <strong class="text-gray-900 dark:text-white">Community Driven</strong> -
+                                        Contribute features, report bugs, and shape the roadmap
+                                    </span>
                                 </li>
                                 <li class="flex items-start gap-2 sm:gap-3">
                                     <UIcon
@@ -390,9 +396,9 @@ onMounted(() => {
                                         class="mt-0.5 h-4 w-4 flex-shrink-0 text-green-500 sm:mt-1 sm:h-5 sm:w-5"
                                     />
                                     <span class="text-sm text-gray-600 sm:text-base dark:text-gray-300">
-                                    <strong class="text-gray-900 dark:text-white">Self-Hostable</strong> - Deploy on
-                                    your own infrastructure for complete control
-                                </span>
+                                        <strong class="text-gray-900 dark:text-white">Self-Hostable</strong> - Deploy on
+                                        your own infrastructure for complete control
+                                    </span>
                                 </li>
                             </ul>
                             <div class="flex gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
@@ -443,7 +449,9 @@ onMounted(() => {
                                     <div class="text-purple-400">bun run dev</div>
                                     <div class="mt-4 w-fit rounded-lg bg-gray-950 p-3 sm:mt-6 sm:p-4">
                                         <div class="text-yellow-400">🚀 Server running on http://localhost:8000</div>
-                                        <div class="text-cyan-400">⚡ Vite dev server running on http://localhost:5173</div>
+                                        <div class="text-cyan-400">
+                                            ⚡ Vite dev server running on http://localhost:5173
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -463,7 +471,9 @@ onMounted(() => {
             >
                 <UContainer>
                     <div class="mb-10 px-4 text-center sm:mb-16 sm:px-6 lg:mb-20 lg:px-8">
-                        <h2 class="mb-3 text-2xl font-bold text-gray-900 sm:mb-4 sm:text-3xl lg:text-5xl dark:text-white">
+                        <h2
+                            class="mb-3 text-2xl font-bold text-gray-900 sm:mb-4 sm:text-3xl lg:text-5xl dark:text-white"
+                        >
                             Perfect For Every Business
                         </h2>
                         <p class="mx-auto max-w-2xl text-sm text-gray-600 sm:text-base lg:text-xl dark:text-gray-300">
@@ -485,7 +495,8 @@ onMounted(() => {
                                 <h3 class="text-xl font-bold text-gray-900 sm:text-2xl dark:text-white">E-commerce</h3>
                             </div>
                             <p class="text-sm text-gray-600 sm:text-base dark:text-gray-300">
-                                Send order confirmations, delivery updates, and promotional messages to customers instantly.
+                                Send order confirmations, delivery updates, and promotional messages to customers
+                                instantly.
                             </p>
                         </div>
 
@@ -621,7 +632,6 @@ onMounted(() => {
             </UFooter>
         </div>
     </UApp>
-
 </template>
 
 <style scoped>

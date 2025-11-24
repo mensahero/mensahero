@@ -1,22 +1,22 @@
-export interface modelResource {
-    data: modelResourceData[]
-    links: modelResourceLinks
-    meta: modelResourceMeta
+export interface IModelResource {
+    data: IModelResourceData[]
+    links: IModelResourceLinks
+    meta: IModelResourceMeta
 }
 
-export interface modelResourceData {
+export interface IModelResourceData {
     id: number | string
     [key: string]: unknown
 }
 
-interface modelResourceLinks {
+export interface IModelResourceLinks {
     first: string
     last: string
     prev: string | null
     next: string | null
 }
 
-export interface modelResourceMeta {
+export interface IModelResourceMeta {
     current_page: number
     from: number
     last_page: number
@@ -24,10 +24,10 @@ export interface modelResourceMeta {
     per_page: number
     to: number
     total: number
-    links: modelResourceMetaLinks[]
+    links: IModelResourceMetaLinks[]
 }
 
-interface modelResourceMetaLinks {
+interface IModelResourceMetaLinks {
     url: string
     label: string
     page: number
