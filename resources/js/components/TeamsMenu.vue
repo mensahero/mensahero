@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import emitter from '@/lib/emitter'
 import apiFetch from '@/lib/ofetch'
+import { router } from '@inertiajs/vue3'
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { computed, onBeforeMount, ref } from 'vue'
 
@@ -48,10 +49,18 @@ const items = computed<DropdownMenuItem[][]>(() => {
             {
                 label: 'Create team',
                 icon: 'i-lucide-circle-plus',
+                onSelect() {
+                    emitter.emit('teams:create')
+                    router.visit(route('teams.manage.index', {}, false))
+                },
             },
             {
                 label: 'Manage teams',
                 icon: 'i-lucide-cog',
+                onSelect() {
+                    emitter.emit('teams:manage')
+                    router.visit(route('teams.manage.index', {}, false))
+                },
             },
         ],
     ]
@@ -73,9 +82,6 @@ onBeforeMount(async () => {
             selectedTeam.value = team
         }
     })
-
-    console.log(teams.value)
-    console.log(selectedTeam.value)
 })
 </script>
 

@@ -4,15 +4,50 @@ namespace App\Http\Controllers\Teams;
 
 use App\Actions\Teams\RetrieveCurrentSessionTeam;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Teams\TeamResource;
 use App\Http\Resources\Teams\TeamsMenuResource;
 use App\Models\Team;
+use App\Services\InertiaNotification;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class TeamsController extends Controller
 {
+    public function index(Request $request): InertiaResponse
+    {
+        $team = app(RetrieveCurrentSessionTeam::class)->handle();
+        $team->load(['owner']);
+
+        return Inertia::render('Teams', [
+            'team' => TeamResource::make($team),
+        ]);
+    }
+
+    public function updateTeamName(Request $request, string $id)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', Rule::unique(Team::class, 'name')->ignore($id)],
+        ]);
+
+        $team = Team::query()->findOrFail($id);
+
+        $team->name = $request->name;
+        $team->save();
+
+        InertiaNotification::make()
+            ->success()
+            ->title('Team Name Updated')
+            ->message('The team name has been updated successfully.')
+            ->send();
+
+        return to_route('teams.manage.index');
+    }
+
     public function getTeams(): JsonResponse
     {
         $user = auth()->user();

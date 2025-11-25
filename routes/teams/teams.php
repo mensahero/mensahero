@@ -20,6 +20,16 @@ Route::post('teams/user/invitation/{id}', [InviteController::class, 'store'])
 
 Route::middleware('auth')->prefix('teams')->group(function () {
 
+    Route::prefix('/manage')->group(function () {
+
+        Route::get('/', [TeamsController::class, 'index'])
+            ->name('teams.manage.index');
+
+        Route::put('/update/team/{id}/name', [TeamsController::class, 'updateTeamName'])
+            ->name('teams.manage.update.team.name');
+
+    });
+
     Route::get('/getAllTeams', [TeamsController::class, 'getTeams'])
         ->name('teams.getAllTeams');
 
