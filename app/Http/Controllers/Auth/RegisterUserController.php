@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Actions\Teams\CreateCurrentSessionTeam;
+use App\Actions\Teams\CreateRolePermission;
 use App\Actions\Teams\CreateTeams;
 use App\Actions\User\CreateUser;
 use App\Http\Controllers\Controller;
@@ -37,6 +38,8 @@ class RegisterUserController extends Controller
                 'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
                 'user_id' => $user->id,
             ], markAsDefault: true);
+
+        app(CreateRolePermission::class)->handle($teams);
 
         event(new Registered($user));
 

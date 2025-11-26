@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use Throwable;
 use App\Actions\Auth\LoginUser;
 use App\Actions\Teams\CreateCurrentSessionTeam;
+use App\Actions\Teams\CreateRolePermission;
 use App\Actions\Teams\CreateTeams;
 use App\Actions\User\CreateUser;
 use App\Http\Controllers\Controller;
@@ -79,6 +81,9 @@ class LoginController extends Controller
         return Inertia::location(Socialite::driver($provider)->redirect());
     }
 
+    /**
+     * @throws Throwable
+     */
     public function ssoStore(Request $request, string $provider): RedirectResponse
     {
         $ssoUser = Socialite::driver($provider)->user();
@@ -94,11 +99,13 @@ class LoginController extends Controller
             ]);
 
             // Create a personal team for the user and it will the default team
-            app(CreateTeams::class)->handle(
+            $teams = app(CreateTeams::class)->handle(
                 attribute: [
                     'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
                     'user_id' => $user->id,
                 ], markAsDefault: true);
+
+            app(CreateRolePermission::class)->handle($teams);
         }
 
         Auth::login($user, $request->boolean('remember'));

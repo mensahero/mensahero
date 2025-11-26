@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Teams;
 
+use Throwable;
 use App\Actions\Teams\CreateCurrentSessionTeam;
+use App\Actions\Teams\CreateRolePermission;
 use App\Actions\Teams\CreateTeams;
 use App\Actions\User\CreateUser;
 use App\Http\Requests\Auth\RegisterRequest;
@@ -75,6 +77,9 @@ class InviteController extends Controller
 
     }
 
+    /**
+     * @throws Throwable
+     */
     public function store(RegisterRequest $request, string $id): RedirectResponse
     {
         // Get the invitation model
@@ -92,6 +97,8 @@ class InviteController extends Controller
                 'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
                 'user_id' => $user->id,
             ], markAsDefault: true);
+
+        app(CreateRolePermission::class)->handle($personalTeam);
 
         event(new Registered($user));
 
