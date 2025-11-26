@@ -92,20 +92,21 @@ class LoginController extends Controller
                 'email'             => $ssoUser->getEmail(),
                 'email_verified_at' => Date::now(),
             ]);
+
+            // Create a personal team for the user and it will the default team
+            app(CreateTeams::class)->handle(
+                attribute: [
+                    'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
+                    'user_id' => $user->id,
+                ], markAsDefault: true);
         }
 
         Auth::login($user, $request->boolean('remember'));
 
         $request->session()->regenerate();
 
-        // Create a personal team for the user and it will the default team
-        $teams = app(CreateTeams::class)->handle(
-            attribute: [
-                'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
-                'user_id' => $user->id,
-            ], markAsDefault: true);
-
-        app(CreateCurrentSessionTeam::class)->handle($teams);
+        $userDefaultTeam = $user->allTeams()->where('default', true)->first();
+        app(CreateCurrentSessionTeam::class)->handle($userDefaultTeam);
 
         return redirect()->intended(route('dashboard', absolute: false));
 
