@@ -26,3 +26,6 @@ Thumbs.db
 # Auto-generated type declarations by NuxtUi
 auto-imports.d.ts
 components.d.ts
+
+# Laradumps
+laradumps.yaml
