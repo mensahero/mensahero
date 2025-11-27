@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Teams;
 
+use App\Concerns\RolesPermissions;
 use Throwable;
 use App\Actions\Teams\CreateCurrentSessionTeam;
 use App\Actions\Teams\CreateRolePermission;
@@ -51,6 +52,17 @@ class InviteController extends Controller
                 'id' => $invitation->id,
             ]);
         }
+
+        // Create a personal team for the user and it will the default team
+        $personalTeam = app(CreateTeams::class)->handle(
+            attribute: [
+                'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
+                'user_id' => $user->id,
+            ], markAsDefault: true);
+
+        app(CreateRolePermission::class)->handle($personalTeam);
+
+        $personalTeam->updateUser($user, RolesPermissions::Administrator->id());
 
         // Accept the invitation
         $team->inviteAccept($invitation->id);
@@ -107,6 +119,8 @@ class InviteController extends Controller
         $request->session()->regenerate();
 
         app(CreateCurrentSessionTeam::class)->handle($personalTeam);
+
+        $personalTeam->updateUser($user, RolesPermissions::Administrator->id());
 
         // Accept the invitation
         $teamInvitation->inviteAccept($invitation->id);

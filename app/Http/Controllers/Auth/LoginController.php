@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Concerns\RolesPermissions;
 use Throwable;
 use App\Actions\Auth\LoginUser;
 use App\Actions\Teams\CreateCurrentSessionTeam;
@@ -106,6 +107,8 @@ class LoginController extends Controller
                 ], markAsDefault: true);
 
             app(CreateRolePermission::class)->handle($teams);
+
+            $teams->updateUser($user, RolesPermissions::Administrator->id());
         }
 
         Auth::login($user, $request->boolean('remember'));
