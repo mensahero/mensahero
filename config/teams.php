@@ -91,7 +91,7 @@ return [
 
         'routes' => [
             'register'   => true,
-            'url'        => '/invitation/{invitation_id}/accept',
+            'url'        => '/invitation/{invitation}/accept',
             'middleware' => 'web',
         ],
     ],

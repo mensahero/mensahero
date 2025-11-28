@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Concerns\RolesPermissions;
-use Throwable;
 use App\Actions\Auth\LoginUser;
 use App\Actions\Teams\CreateCurrentSessionTeam;
 use App\Actions\Teams\CreateRolePermission;
@@ -23,6 +21,7 @@ use Inertia\Response;
 use Laravel\Fortify\Features;
 use Laravel\Socialite\Facades\Socialite;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Throwable;
 
 class LoginController extends Controller
 {
@@ -101,14 +100,13 @@ class LoginController extends Controller
 
             // Create a personal team for the user and it will the default team
             $teams = app(CreateTeams::class)->handle(
+                user: $user,
                 attribute: [
                     'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
                     'user_id' => $user->id,
                 ], markAsDefault: true);
 
             app(CreateRolePermission::class)->handle($teams);
-
-            $teams->updateUser($user, RolesPermissions::Administrator->id());
         }
 
         Auth::login($user, $request->boolean('remember'));

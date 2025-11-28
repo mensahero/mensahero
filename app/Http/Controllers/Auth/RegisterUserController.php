@@ -6,7 +6,6 @@ use App\Actions\Teams\CreateCurrentSessionTeam;
 use App\Actions\Teams\CreateRolePermission;
 use App\Actions\Teams\CreateTeams;
 use App\Actions\User\CreateUser;
-use App\Concerns\RolesPermissions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use Illuminate\Auth\Events\Registered;
@@ -35,14 +34,13 @@ class RegisterUserController extends Controller
 
         // Create a personal team for the user and it will the default team
         $teams = $this->createTeams->handle(
+            user: $user,
             attribute: [
                 'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
                 'user_id' => $user->id,
             ], markAsDefault: true);
 
         app(CreateRolePermission::class)->handle($teams);
-
-        $teams->updateUser($teams, RolesPermissions::Administrator->id());
 
         event(new Registered($user));
 

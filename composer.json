@@ -30,7 +30,6 @@
         "erag/laravel-disposable-email": "^3.7",
         "inertiajs/inertia-laravel": "^2.0",
         "jaybizzle/crawler-detect": "^1.3",
-        "jurager/teams": "^3.0",
         "lacodix/laravel-model-filter": "^3.6",
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",

@@ -6,24 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('permissions', static function (Blueprint $table) {
+        Schema::create('team_invitations', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name');
+            $table->foreignUuid('team_id')->constrained('teams');
+            $table->string('email');
             $table->foreignUuid('role_id');
-            $table->foreignUuid('team_id');
+            $table->timestamps();
+
+            $table->unique(['team_id', 'email']);
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('permissions');
+        Schema::dropIfExists('team_invitations');
     }
 };

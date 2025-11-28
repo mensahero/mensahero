@@ -6,25 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create(Config::get('teams.tables.teams', 'teams'), static function (Blueprint $table) {
+        Schema::create('teams', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('user_id')->index();
+            $table->foreignId('user_id')->constrained('users');
             $table->string('name')->unique();
-            $table->boolean('default')->default(false)->index();
+            $table->string('default');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists(Config::get('teams.tables.teams', 'teams'));
+        Schema::dropIfExists('teams');
     }
 };

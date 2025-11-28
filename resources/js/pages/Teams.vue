@@ -23,44 +23,55 @@ interface ITeams extends ITeam {
     user_owner: User
 }
 
+interface IRolesPermission {
+    name: string
+    value: string
+    description: string
+}
+
 const props = defineProps<{
     team: ITeams
+    roles_permissions: IRolesPermission[]
 }>()
 
-const inertiaPropsReload = () =>
-    router.reload({
-        only: ['teams'],
-    })
+console.log(props.roles_permissions)
 
 const formTeamInfo = useForm({
     name: props.team.name,
 })
 
 const teamInfoSubmit = () => {
+    formTeamInfo.clearErrors()
     formTeamInfo.put(route('teams.manage.update.team.name', props.team.id), {
         onSuccess: () => {
-            formTeamInfo.resetAndClearErrors()
+            reloadProps()
         },
     })
 }
 
-const roleOptions = ref<RadioGroupItem[]>([
-    {
-        label: 'Administrator',
-        value: 'admin',
-        description: 'Administrator user can perform any action on the team records and settings.',
-    },
-    {
-        label: 'Standard',
-        value: 'standard',
-        description: 'Standard user have the ability to read, create, and update.',
-    },
-    {
-        label: 'Lite',
-        value: 'lite',
-        description: 'Lite user can only read.',
-    },
-])
+const reloadProps = () => {
+    router.reload({
+        only: ['teams', 'roles_permissions'],
+    })
+}
+
+const roleOptions = ref<RadioGroupItem[]>(props.roles_permissions)
+
+const inviteMember = useForm({
+    email: '',
+    role: '',
+})
+
+const inviteMemberSubmit = () => {
+    inviteMember.clearErrors()
+    inviteMember.post(route('teams.manage.invite'), {
+        onSuccess: () => {
+            reloadProps()
+        },
+        preserveScroll: true,
+        preserveState: true,
+    })
+}
 </script>
 
 <template>
@@ -113,23 +124,28 @@ const roleOptions = ref<RadioGroupItem[]>([
             <USeparator class="w-10/12" />
             <!--   END: Header Section        -->
 
-            <UForm class="w-5/12 space-y-6 pb-15">
-                <UFormField label="Email" name="email" required>
-                    <UInput class="w-full" />
+            <UForm class="w-5/12 space-y-6 pb-15" @submit.prevent="inviteMemberSubmit">
+                <UFormField label="Email" name="email" :error="inviteMember.errors.email" required>
+                    <UInput v-model="inviteMember.email" class="w-full" />
                 </UFormField>
-                <UFormField label="Role" name="role" required>
+                <UFormField label="Role" name="role" :error="inviteMember.errors.role" required>
                     <URadioGroup
+                        v-model="inviteMember.role"
                         class="w-full"
                         color="primary"
                         variant="table"
-                        default-value="standard"
+                        value-key="id"
                         :items="roleOptions"
                     />
                 </UFormField>
-                <UButton class="flex place-self-end" label="Invite" type="submit" />
+                <UButton
+                    class="flex place-self-end"
+                    :label="inviteMember.recentlySuccessful ? 'Invitation Sent' : 'Invite'"
+                    type="submit"
+                />
             </UForm>
 
-            <!--  Add Team Member Section     -->
+            <!--  Team Member Section     -->
 
             <!--  START:  Header Section        -->
             <HeadingSmall

@@ -1,20 +1,18 @@
 <?php
 
-use App\Http\Controllers\Teams\InviteController;
 use App\Http\Controllers\Teams\TeamsController;
 
-Route::get(config('teams.invitations.routes.url'), [InviteController::class, 'inviteAccept'])
+Route::get('teams/user/invitation/{id}', [TeamsController::class, 'createUser'])
+    ->middleware(['signed', 'guest'])
+    ->name('teams.invitations.create.user');
+
+Route::get('teams/invitation/{id}/accept', [TeamsController::class, 'inviteAccept'])
     ->middleware([
-        config('teams.invitations.routes.middleware'),
         'signed',
     ])
     ->name('teams.invitations.accept');
 
-Route::get('teams/user/invitation/{id}', [InviteController::class, 'createUser'])
-    ->middleware(['signed', 'guest'])
-    ->name('teams.invitations.create.user');
-
-Route::post('teams/user/invitation/{id}', [InviteController::class, 'store'])
+Route::post('teams/user/invitation/{id}', [TeamsController::class, 'store'])
     ->middleware(['guest'])
     ->name('teams.invitations.store.user');
 
@@ -27,6 +25,9 @@ Route::middleware('auth')->prefix('teams')->group(function () {
 
         Route::put('/update/team/{id}/name', [TeamsController::class, 'updateTeamName'])
             ->name('teams.manage.update.team.name');
+
+        Route::post('/invitation/send', [TeamsController::class, 'inviteViaEmail'])
+            ->name('teams.manage.invite');
 
     });
 

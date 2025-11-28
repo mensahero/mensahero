@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -14,12 +13,10 @@ return new class extends Migration
     {
         Schema::create('roles', static function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid(Config::get('teams.foreign_keys.team_id', 'team_id'))->constrained()->cascadeOnDelete();
-            $table->string('code');
-            $table->string('name')->nullable();
-            $table->string('description')->nullable();
+            $table->foreignUuid('team_id');
+            $table->string('name');
 
-            $table->unique([Config::get('teams.foreign_keys.team_id', 'team_id'), 'code']);
+            $table->unique(['team_id', 'name']);
         });
     }
 

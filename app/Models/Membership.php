@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Jurager\Teams\Models\Membership as BaseMembership;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class Membership extends BaseMembership
+class Membership extends Pivot
 {
-    use HasUuids;
-
+    /**
+     * The table associated with the pivot model.
+     *
+     * @var string
+     */
+    protected $table = 'team_user';
 }
