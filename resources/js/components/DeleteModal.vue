@@ -3,6 +3,7 @@ defineProps<{
     title?: string
     description?: string
     closeLabel?: string
+    actionLabel?: string
     onSubmit: () => void
 }>()
 
@@ -33,7 +34,7 @@ const closeModal = () => {
                 "
             />
             <UButton
-                label="Delete"
+                :label="actionLabel ?? 'Delete'"
                 color="error"
                 @click="
                     () => {

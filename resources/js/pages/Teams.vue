@@ -47,7 +47,7 @@ export interface IMembers {
             email_verified_at: string
             created_at: string
             updated_at: string
-            [k: string]: unknown
+            is_owner: boolean
         }[]
     }
 }
@@ -59,6 +59,7 @@ export type TMembersTable = {
     created_at: string
     role: IRolesPermission['label'] | 'N/A'
     status: 'Member' | 'Invited'
+    is_owner: boolean
 }
 
 const props = defineProps<{
@@ -81,6 +82,7 @@ const membersInvitedData = ref<TMembersTable[]>(
         status: 'Invited',
         role: props.roles_permissions.find((role) => role.uuid === inviteMember.role_id)?.label ?? 'N/A',
         name: '',
+        is_owner: false,
     })),
 )
 const mergeMembersTableData = ref<TMembersTable[]>(membersData.value.concat(membersInvitedData.value))
@@ -154,7 +156,6 @@ const inviteMemberSubmit = () => {
                 </UFormField>
 
                 <UButton
-                    class="flex place-self-end"
                     :label="formTeamInfo.recentlySuccessful ? 'Saved.' : 'Save'"
                     type="submit"
                     :disabled="formTeamInfo.processing"
@@ -188,11 +189,7 @@ const inviteMemberSubmit = () => {
                         :items="roleOptions"
                     />
                 </UFormField>
-                <UButton
-                    class="flex place-self-end"
-                    :label="inviteMember.recentlySuccessful ? 'Invitation Sent' : 'Invite'"
-                    type="submit"
-                />
+                <UButton :label="inviteMember.recentlySuccessful ? 'Invitation Sent' : 'Invite'" type="submit" />
             </UForm>
 
             <USeparator class="w-10/12" />

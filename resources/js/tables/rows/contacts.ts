@@ -44,6 +44,7 @@ export const contactRows = (row: Row<IContact>) => {
         },
         {
             label: 'Delete Contact',
+            color: 'error',
             onSelect: async () => {
                 await deleteActionModal.open({
                     onSubmit: () => {

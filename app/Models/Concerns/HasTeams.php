@@ -71,7 +71,7 @@ trait HasTeams
             return false;
         }
 
-        return $this->id == $team->{$this->getForeignKey()};
+        return $this->id == $team->user_id;
     }
 
     /**

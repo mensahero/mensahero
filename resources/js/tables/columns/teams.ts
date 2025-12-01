@@ -1,7 +1,10 @@
 import { TMembersTable } from '@/pages/Teams.vue'
+import { teamsRows } from '@/tables/rows/teams'
 import type { TableColumn } from '@nuxt/ui'
 import UAvatar from '@nuxt/ui/runtime/components/Avatar.vue'
 import UBadge from '@nuxt/ui/runtime/components/Badge.vue'
+import UButton from '@nuxt/ui/runtime/components/Button.vue'
+import UDropdownMenu from '@nuxt/ui/runtime/components/DropdownMenu.vue'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
 import utc from 'dayjs/plugin/utc'
@@ -55,5 +58,30 @@ export const columns: TableColumn<TMembersTable>[] = [
     {
         accessorKey: 'actions',
         header: 'Actions',
+        cell: ({ row }) => {
+            return h(
+                'div',
+                { class: 'text-right' },
+                h(
+                    UDropdownMenu,
+                    {
+                        content: {
+                            align: 'end',
+                        },
+                        items: teamsRows(row),
+                        'aria-label': 'Table rows actions dropdown menu',
+                    },
+                    () =>
+                        h(UButton, {
+                            icon: 'i-lucide-ellipsis-vertical',
+                            color: 'neutral',
+                            variant: 'ghost',
+                            class: 'ml-auto',
+                            'data-test': 'member-actions-dropdown-trigger',
+                            'aria-label': 'Actions dropdown',
+                        }),
+                ),
+            )
+        },
     },
 ]

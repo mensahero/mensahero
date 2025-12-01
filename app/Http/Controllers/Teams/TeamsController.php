@@ -10,10 +10,10 @@ use App\Actions\User\CreateUser;
 use App\Concerns\RolesPermissions;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Http\Resources\Auth\UserResource;
 use App\Http\Resources\Teams\InvitationMemberResource;
 use App\Http\Resources\Teams\TeamResource;
 use App\Http\Resources\Teams\TeamsMenuResource;
+use App\Http\Resources\Teams\TeamUsersResource;
 use App\Mail\Team\TeamInvitationMail;
 use App\Models\Team;
 use App\Models\TeamInvitation;
@@ -45,7 +45,7 @@ class TeamsController extends Controller
             'team'                => TeamResource::make($teamWithOwner),
             'members'             => [
                 'invited' => InvitationMemberResource::collection($team->teamInvitations),
-                'members' => UserResource::collection($team->allUsers()),
+                'members' => TeamUsersResource::collection($team->users),
             ],
             'roles_permissions'   => collect($team->role)->map(fn ($role) => [
                 'uuid'        => $role->id,
