@@ -81,7 +81,7 @@ class TeamsController extends Controller
                 'id' => $searchInvite->id,
             ]);
 
-            Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl));
+            Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl, $searchInvite));
         }
 
         $invitation = $team->teamInvitations()->create([
@@ -93,8 +93,25 @@ class TeamsController extends Controller
             'id' => $invitation->id,
         ]);
 
-        Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl));
+        Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl, $invitation));
 
+    }
+
+    public function resendInvitation(string $id)
+    {
+        $invitation = TeamInvitation::query()->findOrFail($id);
+        $actionUrl = URL::signedRoute('teams.invitations.accept', [
+            'id' => $id,
+        ]);
+        Mail::to($invitation->email)->queue(new TeamInvitationMail($actionUrl, $invitation));
+
+        InertiaNotification::make()
+            ->success()
+            ->title('Invitation resent')
+            ->message('The invitation has been resent successfully.')
+            ->send();
+
+        return back();
     }
 
     /**

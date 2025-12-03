@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import emitter from '@/lib/emitter'
 import apiFetch from '@/lib/ofetch'
+import { TEAMS_EVENTS } from '@/utils/constants'
 import { router } from '@inertiajs/vue3'
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { computed, onBeforeMount, ref } from 'vue'
@@ -66,7 +67,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
     ]
 })
 
-onBeforeMount(async () => {
+const retrieveTeams = async () => {
     const teamsResp = await apiFetch<ITeams[]>(route('teams.getTeamMenu'))
     teams.value = teamsResp.map((team: ITeams) => {
         return {
@@ -82,6 +83,10 @@ onBeforeMount(async () => {
             selectedTeam.value = team
         }
     })
+}
+
+onBeforeMount(async () => {
+    await retrieveTeams()
 })
 
 const reloadTeamsAndPermissions = () => {
@@ -90,7 +95,10 @@ const reloadTeamsAndPermissions = () => {
     })
 }
 
-emitter.on('teams:switch', () => reloadTeamsAndPermissions())
+emitter.on(TEAMS_EVENTS.SWITCH, () => reloadTeamsAndPermissions())
+emitter.on(TEAMS_EVENTS.UPDATE, async () => {
+    await retrieveTeams()
+})
 </script>
 
 <template>

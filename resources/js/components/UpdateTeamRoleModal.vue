@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import emitter from '@/lib/emitter'
 import apiFetch from '@/lib/ofetch'
+import { TEAMS_EVENTS } from '@/utils/constants'
 import { useForm } from '@inertiajs/vue3'
 import type { RadioGroupItem } from '@nuxt/ui'
 import { onBeforeMount, ref } from 'vue'
@@ -37,7 +38,7 @@ const onSubmit = () => {
             preserveScroll: true,
             preserveState: true,
             onSuccess: (params) => {
-                emitter.emit('team:member:role:updated', params.props.teamMemberId)
+                emitter.emit(TEAMS_EVENTS.MEMBER_ROLE_CHANGED, params.props.teamMemberId)
                 // close the modal
                 closeModal()
             },

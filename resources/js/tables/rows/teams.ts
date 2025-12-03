@@ -2,7 +2,8 @@ import DeleteModal from '@/components/DeleteModal.vue'
 import UpdateTeamRoleModal from '@/components/UpdateTeamRoleModal.vue'
 import emitter from '@/lib/emitter'
 import { TMembersTable } from '@/pages/Teams.vue'
-import { useForm } from '@inertiajs/vue3'
+import { TEAMS_EVENTS } from '@/utils/constants'
+import { router, useForm } from '@inertiajs/vue3'
 import type { Row } from '@tanstack/table-core'
 import { lowerFirst } from 'scule'
 
@@ -30,7 +31,15 @@ export const teamsRows = (row: Row<TMembersTable>) => {
             label: 'Resend Invite',
             disabled: row.original.status !== 'Invited',
             onSelect: async () => {
-                console.log('resend invite')
+                router.post(
+                    route('teams.invitations.resend', row.original.id),
+                    {},
+                    {
+                        onSuccess: () => {
+                            emitter.emit(TEAMS_EVENTS.MEMBER_INVITATION_RESENT)
+                        },
+                    },
+                )
             },
         },
         {
@@ -49,7 +58,7 @@ export const teamsRows = (row: Row<TMembersTable>) => {
                     onSubmit: () => {
                         form.delete(route('teams.manage.remove.team.member', row.original.id), {
                             onSuccess: () => {
-                                emitter.emit('team:member:deleted')
+                                emitter.emit(TEAMS_EVENTS.MEMBER_REMOVED)
                             },
                         })
                     },

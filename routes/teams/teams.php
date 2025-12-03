@@ -2,19 +2,26 @@
 
 use App\Http\Controllers\Teams\TeamsController;
 
-Route::get('teams/user/invitation/{id}', [TeamsController::class, 'createUser'])
-    ->middleware(['signed', 'guest'])
-    ->name('teams.invitations.create.user');
+Route::prefix('teams')->group(function () {
+    Route::get('/user/invitation/{id}', [TeamsController::class, 'createUser'])
+        ->middleware(['signed', 'guest'])
+        ->name('teams.invitations.create.user');
 
-Route::get('teams/invitation/{id}/accept', [TeamsController::class, 'inviteAccept'])
-    ->middleware([
-        'signed',
-    ])
-    ->name('teams.invitations.accept');
+    Route::get('/invitation/{id}/accept', [TeamsController::class, 'inviteAccept'])
+        ->middleware([
+            'signed',
+        ])
+        ->name('teams.invitations.accept');
 
-Route::post('teams/user/invitation/{id}', [TeamsController::class, 'store'])
-    ->middleware(['guest'])
-    ->name('teams.invitations.store.user');
+    Route::post('/user/invitation/{id}', [TeamsController::class, 'store'])
+        ->middleware(['guest'])
+        ->name('teams.invitations.store.user');
+
+    Route::post('/invitation/{id}/resend', [TeamsController::class, 'resendInvitation'])
+        ->middleware(['auth'])
+        ->name('teams.invitations.resend');
+
+});
 
 Route::middleware('auth')->prefix('teams')->group(function () {
 

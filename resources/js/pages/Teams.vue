@@ -4,6 +4,7 @@ import emitter from '@/lib/emitter'
 import { columns } from '@/tables/columns/teams'
 import { ITeam } from '@/types/teams'
 import { User } from '@/types/user'
+import { TEAMS_EVENTS } from '@/utils/constants'
 import { Head, router, useForm } from '@inertiajs/vue3'
 import type { RadioGroupItem } from '@nuxt/ui'
 import { onMounted, ref, watch } from 'vue'
@@ -86,6 +87,7 @@ const teamInfoSubmit = () => {
     formTeamInfo.put(route('teams.manage.update.team.name', props.team.id), {
         onSuccess: () => {
             reloadProps()
+            emitter.emit(TEAMS_EVENTS.UPDATE)
         },
     })
 }
@@ -105,6 +107,7 @@ const inviteMemberSubmit = () => {
     inviteMember.clearErrors()
     inviteMember.post(route('teams.manage.invite'), {
         onSuccess: () => {
+            emitter.emit(TEAMS_EVENTS.MEMBER_INVITED)
             inviteMember.resetAndClearErrors()
             reloadProps()
         },
@@ -135,6 +138,10 @@ onMounted(() => {
     // prep members table
     prepMembersTableData()
 })
+
+const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+}
 
 emitter.on('*', () => reloadProps)
 
@@ -235,7 +242,33 @@ watch(
                 }"
                 :data="mergeMembersTableData"
                 :columns="columns"
-            />
+            >
+                <template #empty>
+                    <UEmpty
+                        size="sm"
+                        variant="naked"
+                        icon="i-heroicons:user-group"
+                        title="No Team Members found"
+                        description="It looks like you haven't added any members."
+                        :actions="[
+                            {
+                                icon: 'i-heroicons:user-plus',
+                                label: 'Invite Team Member',
+                                onClick: async () => {
+                                    scrollTo('add-team-member-section')
+                                },
+                            },
+                            {
+                                icon: 'i-lucide-refresh-cw',
+                                label: 'Refresh',
+                                color: 'neutral',
+                                variant: 'subtle',
+                                onClick: () => reloadProps(),
+                            },
+                        ]"
+                    />
+                </template>
+            </UTable>
         </div>
     </AppLayout>
 </template>
