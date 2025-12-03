@@ -29,7 +29,16 @@ Route::middleware('auth')->prefix('teams')->group(function () {
         Route::post('/invitation/send', [TeamsController::class, 'inviteViaEmail'])
             ->name('teams.manage.invite');
 
+        Route::patch('/update/team/member/{id}/role', [TeamsController::class, 'updateTeamMemberRole'])
+            ->name('teams.manage.update.team.member.role');
+
+        Route::delete('/remove/team/member/{id}', [TeamsController::class, 'removeTeamMember'])
+            ->name('teams.manage.remove.team.member');
+
     });
+
+    Route::get('/getTeamRoles', [TeamsController::class, 'getTeamRoles'])
+        ->name('teams.getTeamRoles');
 
     Route::get('/getAllTeams', [TeamsController::class, 'getTeams'])
         ->name('teams.getAllTeams');

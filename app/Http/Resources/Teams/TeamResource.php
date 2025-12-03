@@ -11,7 +11,7 @@ use Override;
 /** @mixin Team */
 class TeamResource extends JsonResource
 {
-    public static $wrap = false;
+    public static $wrap = null;
 
     /**
      * @param Request $request

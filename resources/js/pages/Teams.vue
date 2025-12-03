@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import Layout from '@/layouts/default.vue'
+import emitter from '@/lib/emitter'
 import { columns } from '@/tables/columns/teams'
 import { ITeam } from '@/types/teams'
 import { User } from '@/types/user'
 import { Head, router, useForm } from '@inertiajs/vue3'
 import type { RadioGroupItem } from '@nuxt/ui'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 defineOptions({ layout: Layout })
 
@@ -48,6 +49,7 @@ export interface IMembers {
             created_at: string
             updated_at: string
             is_owner: boolean
+            role_id: string
         }[]
     }
 }
@@ -58,6 +60,7 @@ export type TMembersTable = {
     email: string
     created_at: string
     role: IRolesPermission['label'] | 'N/A'
+    role_id: string
     status: 'Member' | 'Invited'
     is_owner: boolean
 }
@@ -69,25 +72,10 @@ const props = defineProps<{
 }>()
 
 const roleOptions = ref<RadioGroupItem[]>(props.roles_permissions)
-const membersData = ref<TMembersTable[]>(
-    props.members.members.data.map((member) => ({
-        ...member,
-        status: 'Member',
-        role: props.roles_permissions.find((role) => role.uuid === member.role_id)?.label ?? 'N/A',
-    })),
-)
-const membersInvitedData = ref<TMembersTable[]>(
-    props.members.invited.data.map((inviteMember) => ({
-        ...inviteMember,
-        status: 'Invited',
-        role: props.roles_permissions.find((role) => role.uuid === inviteMember.role_id)?.label ?? 'N/A',
-        name: '',
-        is_owner: false,
-    })),
-)
-const mergeMembersTableData = ref<TMembersTable[]>(membersData.value.concat(membersInvitedData.value))
-
-console.log(mergeMembersTableData)
+const membersProps = ref<IMembers>(props.members)
+const membersData = ref<TMembersTable[]>()
+const membersInvitedData = ref<TMembersTable[]>()
+const mergeMembersTableData = ref<TMembersTable[]>()
 
 const formTeamInfo = useForm({
     name: props.team.name,
@@ -104,7 +92,7 @@ const teamInfoSubmit = () => {
 
 const reloadProps = () => {
     router.reload({
-        only: ['teams', 'roles_permissions'],
+        only: ['teams', 'roles_permissions', 'members'],
     })
 }
 
@@ -124,6 +112,39 @@ const inviteMemberSubmit = () => {
         preserveState: true,
     })
 }
+
+const prepMembersTableData = () => {
+    membersData.value = membersProps.value.members.data.map((member) => ({
+        ...member,
+        status: 'Member',
+        role: props.roles_permissions.find((role) => role.uuid === member.role_id)?.label ?? 'N/A',
+    }))
+
+    membersInvitedData.value = membersProps.value.invited.data.map((inviteMember) => ({
+        ...inviteMember,
+        status: 'Invited',
+        role: props.roles_permissions.find((role) => role.uuid === inviteMember.role_id)?.label ?? 'N/A',
+        name: '',
+        is_owner: false,
+    }))
+
+    mergeMembersTableData.value = membersData.value.concat(membersInvitedData.value)
+}
+
+onMounted(() => {
+    // prep members table
+    prepMembersTableData()
+})
+
+emitter.on('*', () => reloadProps)
+
+watch(
+    () => props.members,
+    (newMembersData) => {
+        membersProps.value = newMembersData
+        prepMembersTableData()
+    },
+)
 </script>
 
 <template>

@@ -33,6 +33,7 @@ use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Inertia\Response as InertiaResponse;
+use Throwable;
 
 class TeamsController extends Controller
 {
@@ -165,7 +166,12 @@ class TeamsController extends Controller
      * Accept the invitation and create the user.
      *
      *
+     * @param RegisterRequest $request
+     * @param string          $id
+     *
      * @throws Throwable
+     *
+     * @return RedirectResponse
      */
     public function store(RegisterRequest $request, string $id): RedirectResponse
     {
@@ -208,7 +214,15 @@ class TeamsController extends Controller
 
     }
 
-    public function updateTeamName(Request $request, string $id)
+    /**
+     * @param Request $request
+     * @param string  $id
+     *
+     * @throws Exception
+     *
+     * @return RedirectResponse
+     */
+    public function updateTeamName(Request $request, string $id): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique(Team::class, 'name')->ignore($id)],
@@ -226,6 +240,94 @@ class TeamsController extends Controller
             ->send();
 
         return to_route('teams.manage.index');
+    }
+
+    /**
+     * Remove a team member from the team or revoke the invitation.
+     *
+     * @param Request $request
+     * @param string  $id
+     *
+     * @throws Exception
+     *
+     * @return RedirectResponse
+     */
+    public function removeTeamMember(Request $request, string $id): RedirectResponse
+    {
+        $request->validate([
+            'isMember' => ['required', 'boolean:true,false'],
+        ]);
+
+        if ($request->boolean('isMember')) {
+            $team = app(RetrieveCurrentSessionTeam::class)->handle();
+            $user = User::query()->findOrFail($id);
+            $team->removeUser($user);
+        } else {
+            $invitation = TeamInvitation::query()->findOrFail($id);
+            $invitation->delete();
+        }
+
+        InertiaNotification::make()
+            ->success()
+            ->title(__(':type :removed', ['type' => $request->boolean('isMember') ? 'Member' : 'Invitation', 'removed' => $request->boolean('isMember') ? 'Removed' : 'Revoked']))
+            ->message(__(':type has been :removed successfully.', ['type' => $request->boolean('isMember') ? 'Member' : 'Invitation', 'removed' => $request->boolean('isMember') ? 'removed' : 'revoked']))
+            ->send();
+
+        return to_route('teams.manage.index');
+    }
+
+    /**
+     * @param Request $request
+     * @param string  $id
+     *
+     * @throws Exception
+     *
+     * @return RedirectResponse
+     */
+    public function updateTeamMemberRole(Request $request, string $id): RedirectResponse
+    {
+        $request->merge([
+            'team_id' => app(RetrieveCurrentSessionTeam::class)->handle()->id,
+        ]);
+
+        $request->validate([
+            'role'           => ['required', 'exists:roles,id'],
+            'team_id'        => ['required', 'exists:teams,id'],
+            'isMember'       => ['required', 'boolean:true,false'],
+        ]);
+
+        if ($request->boolean('isMember')) {
+            $team = Team::query()->findOrFail($request->team_id);
+            $team->users()->updateExistingPivot($id, ['role_id' => $request->role]);
+        }
+
+        $invitation = TeamInvitation::query()->findOrFail($id);
+        $invitation->forceFill([
+            'role_id' => $request->role,
+        ]);
+        $invitation->save();
+
+        InertiaNotification::make()
+            ->success()
+            ->title('Role Updated')
+            ->message('The role has been updated successfully.')
+            ->send();
+
+        return to_route('teams.manage.index');
+
+    }
+
+    public function getTeamRoles(): JsonResponse
+    {
+        $team = app(RetrieveCurrentSessionTeam::class)->handle();
+
+        return response()->json([
+            'roles' => collect($team->role)->map(fn ($role) => [
+                'uuid'        => $role->id,
+                'label'       => RolesPermissions::tryFrom($role->name)->label(),
+                'description' => RolesPermissions::tryFrom($role->name)->description(),
+            ]),
+        ]);
     }
 
     public function getTeams(): JsonResponse
