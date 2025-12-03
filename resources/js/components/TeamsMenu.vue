@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import CreateTeam from '@/components/CreateTeamModal.vue'
 import emitter from '@/lib/emitter'
 import apiFetch from '@/lib/ofetch'
 import { TEAMS_EVENTS } from '@/utils/constants'
@@ -30,6 +31,9 @@ interface ITeamsMenu {
 }
 
 const teams = ref<ITeamsMenu[]>([])
+const overlay = useOverlay()
+const createTeamModalAction = overlay.create(CreateTeam)
+
 const selectedTeam = ref<ITeamsMenu>()
 
 const items = computed<DropdownMenuItem[][]>(() => {
@@ -43,23 +47,21 @@ const items = computed<DropdownMenuItem[][]>(() => {
                     body: {
                         team: team.id,
                     },
-                }).then(() => emitter.emit('teams:switch', team.id))
+                }).then(() => emitter.emit(TEAMS_EVENTS.SWITCH, team.id))
             },
         })),
         [
             {
                 label: 'Create team',
                 icon: 'i-lucide-circle-plus',
-                onSelect() {
-                    emitter.emit('teams:create')
-                    router.visit(route('teams.manage.index', {}, false))
+                onSelect: async () => {
+                    await createTeamModalAction.open().result
                 },
             },
             {
                 label: 'Manage teams',
                 icon: 'i-lucide-cog',
                 onSelect() {
-                    emitter.emit('teams:manage')
                     router.visit(route('teams.manage.index', {}, false))
                 },
             },
@@ -97,6 +99,9 @@ const reloadTeamsAndPermissions = () => {
 
 emitter.on(TEAMS_EVENTS.SWITCH, () => reloadTeamsAndPermissions())
 emitter.on(TEAMS_EVENTS.UPDATE, async () => {
+    await retrieveTeams()
+})
+emitter.on(TEAMS_EVENTS.CREATE, async () => {
     await retrieveTeams()
 })
 </script>

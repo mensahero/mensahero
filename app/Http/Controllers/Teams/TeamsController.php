@@ -232,6 +232,28 @@ class TeamsController extends Controller
     }
 
     /**
+     * @throws Throwable
+     */
+    public function createNewTeam(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'name'    => ['required', 'string', 'max:255', 'unique:teams,name'],
+            'default' => ['required', 'boolean:true,false'],
+        ]);
+
+        $user = auth()->user();
+        $team = app(CreateTeams::class)->handle($user, [
+            'name'    => Str::ucwords($request->name),
+            'default' => $request->boolean('default'),
+        ], $request->boolean('default'));
+        app(CreateRolePermission::class)->handle($team);
+
+        app(CreateCurrentSessionTeam::class)->handle($team);
+
+        return to_route('dashboard');
+    }
+
+    /**
      * @param Request $request
      * @param string  $id
      *

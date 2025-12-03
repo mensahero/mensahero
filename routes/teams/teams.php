@@ -36,6 +36,9 @@ Route::middleware('auth')->prefix('teams')->group(function () {
         Route::post('/invitation/send', [TeamsController::class, 'inviteViaEmail'])
             ->name('teams.manage.invite');
 
+        Route::post('team/create', [TeamsController::class, 'createNewTeam'])
+            ->name('teams.manage.create.team');
+
         Route::patch('/update/team/member/{id}/role', [TeamsController::class, 'updateTeamMemberRole'])
             ->name('teams.manage.update.team.member.role');
 
