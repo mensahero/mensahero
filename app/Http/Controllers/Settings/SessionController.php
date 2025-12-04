@@ -56,7 +56,7 @@ class SessionController extends Controller implements HasMiddleware
      */
     public function destroy(Request $request): RedirectResponse
     {
-        $confirmed = app(ConfirmPassword::class)(
+        $confirmed = resolve(ConfirmPassword::class)(
             $this->guard, $request->user(), $request->input('password')
         );
 

@@ -60,7 +60,7 @@ class LoginController extends Controller
         $request->session()->regenerate();
 
         $userDefaultTeam = $user->allTeams()->where('default', true)->first();
-        app(CreateCurrentSessionTeam::class)->handle($userDefaultTeam);
+        resolve(CreateCurrentSessionTeam::class)->handle($userDefaultTeam);
 
         return redirect()->intended(route('dashboard', absolute: false));
 
@@ -99,14 +99,14 @@ class LoginController extends Controller
             ]);
 
             // Create a personal team for the user and it will the default team
-            $teams = app(CreateTeams::class)->handle(
+            $teams = resolve(CreateTeams::class)->handle(
                 user: $user,
                 attribute: [
                     'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
                     'user_id' => $user->id,
                 ], markAsDefault: true);
 
-            app(CreateRolePermission::class)->handle($teams);
+            resolve(CreateRolePermission::class)->handle($teams);
         }
 
         Auth::login($user, $request->boolean('remember'));
@@ -114,7 +114,7 @@ class LoginController extends Controller
         $request->session()->regenerate();
 
         $userDefaultTeam = $user->allTeams()->where('default', true)->first();
-        app(CreateCurrentSessionTeam::class)->handle($userDefaultTeam);
+        resolve(CreateCurrentSessionTeam::class)->handle($userDefaultTeam);
 
         return redirect()->intended(route('dashboard', absolute: false));
 

@@ -22,7 +22,7 @@ final class InertiaNotification
 
     public static function make(?string $name = null): InertiaNotification
     {
-        return app(InertiaNotification::class, [
+        return resolve(InertiaNotification::class, [
             'key' => $name ?? 'notification',
         ]);
     }

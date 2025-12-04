@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import DeleteTeam from '@/components/DeleteTeam.vue'
 import Layout from '@/layouts/default.vue'
 import emitter from '@/lib/emitter'
 import { columns } from '@/tables/columns/teams'
@@ -23,6 +24,9 @@ const breadcrumbItems = ref([
 ])
 
 interface ITeams extends ITeam {
+    id: string
+    name: string
+    default: boolean
     user_owner: User
 }
 
@@ -70,6 +74,7 @@ const props = defineProps<{
     team: ITeams
     roles_permissions: IRolesPermission[]
     members: IMembers
+    deletePasswordRequired: boolean
 }>()
 
 const roleOptions = ref<RadioGroupItem[]>(props.roles_permissions)
@@ -269,6 +274,10 @@ watch(
                     />
                 </template>
             </UTable>
+            <USeparator class="w-10/12" />
+
+            <!--  Delete Team Section     -->
+            <DeleteTeam :deletePasswordRequired="props.deletePasswordRequired" :isDefaultTeam="props.team.default" />
         </div>
     </AppLayout>
 </template>

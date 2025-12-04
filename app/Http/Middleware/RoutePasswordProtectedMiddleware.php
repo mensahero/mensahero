@@ -23,7 +23,7 @@ class RoutePasswordProtectedMiddleware
     public function handle(Request $request, Closure $next): mixed
     {
         if (Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword') && filled(auth()->user()->password)) {
-            return app(RequirePassword::class)->handle($request, $next);
+            return resolve(RequirePassword::class)->handle($request, $next);
         }
 
         return $next($request);

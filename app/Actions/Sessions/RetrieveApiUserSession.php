@@ -34,7 +34,7 @@ class RetrieveApiUserSession
         }
 
         return collect(
-            DB::connection(config('session.connection'))->table(app(Sanctum::personalAccessTokenModel())->getTable())
+            DB::connection(config('session.connection'))->table(resolve(Sanctum::personalAccessTokenModel())->getTable())
                 ->where('tokenable_id', $request->user()->getAuthIdentifier())
                 ->latest('last_used_at')
                 ->get()

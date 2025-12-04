@@ -35,7 +35,10 @@ const onSubmit = () => {
     <UModal
         :close="{ onClick: () => closeModal() }"
         :title="title ?? 'Create New Team'"
-        :description="description ?? 'Create a new team to collaborate with others and you can also set it as the default team for future logins. You will be redirected to the team dashboard after creating a new team.'"
+        :description="
+            description ??
+            'Create a new team to collaborate with others and you can also set it as the default team for future logins. You will be redirected to the team dashboard after creating a new team.'
+        "
         :ui="{ footer: 'justify-end', body: 'w-full' }"
     >
         <template #body>

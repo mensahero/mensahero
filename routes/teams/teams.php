@@ -1,23 +1,24 @@
 <?php
 
+use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Controllers\Teams\TeamsController;
 
 Route::prefix('teams')->group(function () {
-    Route::get('/user/invitation/{id}', [TeamsController::class, 'createUser'])
+    Route::get('/user/invitation/{id}', [TeamInvitationController::class, 'createUser'])
         ->middleware(['signed', 'guest'])
         ->name('teams.invitations.create.user');
 
-    Route::get('/invitation/{id}/accept', [TeamsController::class, 'inviteAccept'])
+    Route::get('/invitation/{id}/accept', [TeamInvitationController::class, 'inviteAccept'])
         ->middleware([
             'signed',
         ])
         ->name('teams.invitations.accept');
 
-    Route::post('/user/invitation/{id}', [TeamsController::class, 'store'])
+    Route::post('/user/invitation/{id}', [TeamInvitationController::class, 'store'])
         ->middleware(['guest'])
         ->name('teams.invitations.store.user');
 
-    Route::post('/invitation/{id}/resend', [TeamsController::class, 'resendInvitation'])
+    Route::post('/invitation/{id}/resend', [TeamInvitationController::class, 'resendInvitation'])
         ->middleware(['auth'])
         ->name('teams.invitations.resend');
 
@@ -33,7 +34,7 @@ Route::middleware('auth')->prefix('teams')->group(function () {
         Route::put('/update/team/{id}/name', [TeamsController::class, 'updateTeamName'])
             ->name('teams.manage.update.team.name');
 
-        Route::post('/invitation/send', [TeamsController::class, 'inviteViaEmail'])
+        Route::post('/invitation/send', [TeamInvitationController::class, 'inviteViaEmail'])
             ->name('teams.manage.invite');
 
         Route::post('team/create', [TeamsController::class, 'createNewTeam'])
@@ -44,6 +45,9 @@ Route::middleware('auth')->prefix('teams')->group(function () {
 
         Route::delete('/remove/team/member/{id}', [TeamsController::class, 'removeTeamMember'])
             ->name('teams.manage.remove.team.member');
+
+        Route::delete('destroy/team', [TeamsController::class, 'destroy'])
+            ->name('teams.manage.destroy.team');
 
     });
 

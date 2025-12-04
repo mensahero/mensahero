@@ -11,6 +11,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -27,7 +28,7 @@ trait HasTeams
      */
     public function isCurrentTeam(Team $team): bool
     {
-        return $team->id === app(RetrieveCurrentSessionTeam::class)->handle()->id;
+        return $team->id === resolve(RetrieveCurrentSessionTeam::class)->handle()->id;
     }
 
     /**
@@ -37,7 +38,7 @@ trait HasTeams
      */
     public function currentTeam(): Team
     {
-        return app(RetrieveCurrentSessionTeam::class)->handle();
+        return resolve(RetrieveCurrentSessionTeam::class)->handle();
     }
 
     /**
@@ -53,7 +54,7 @@ trait HasTeams
             return false;
         }
 
-        app(CreateCurrentSessionTeam::class)->handle($team);
+        resolve(CreateCurrentSessionTeam::class)->handle($team);
 
         return true;
     }
@@ -67,7 +68,7 @@ trait HasTeams
     }
 
     /**
-     * @return HasMany
+     * @return HasMany<Team, $this>
      */
     public function ownedTeams(): HasMany
     {
@@ -75,7 +76,7 @@ trait HasTeams
     }
 
     /**
-     * @return BelongsToMany
+     * @return BelongsToMany<Team, $this, Pivot>
      */
     public function teams(): BelongsToMany
     {

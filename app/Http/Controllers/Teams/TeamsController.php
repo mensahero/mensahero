@@ -6,32 +6,24 @@ use App\Actions\Teams\CreateCurrentSessionTeam;
 use App\Actions\Teams\CreateRolePermission;
 use App\Actions\Teams\CreateTeams;
 use App\Actions\Teams\RetrieveCurrentSessionTeam;
-use App\Actions\User\CreateUser;
 use App\Concerns\RolesPermissions;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\Teams\InvitationMemberResource;
 use App\Http\Resources\Teams\TeamResource;
 use App\Http\Resources\Teams\TeamsMenuResource;
 use App\Http\Resources\Teams\TeamUsersResource;
-use App\Mail\Team\TeamInvitationMail;
 use App\Models\Team;
 use App\Models\TeamInvitation;
 use App\Models\User;
 use App\Services\InertiaNotification;
 use Exception;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
-use Inertia\Response;
 use Inertia\Response as InertiaResponse;
 use Throwable;
 
@@ -39,7 +31,7 @@ class TeamsController extends Controller
 {
     public function index(Request $request): InertiaResponse
     {
-        $teamWithOwner = $team = app(RetrieveCurrentSessionTeam::class)->handle();
+        $teamWithOwner = $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
         $teamWithOwner->load(['owner']);
 
         return Inertia::render('Teams', [
@@ -53,182 +45,8 @@ class TeamsController extends Controller
                 'label'       => RolesPermissions::tryFrom($role->name)->label(),
                 'description' => RolesPermissions::tryFrom($role->name)->description(),
             ]),
+            'deletePasswordRequired' => filled($request->user()->password),
         ]);
-    }
-
-    /**
-     *  Invite a user via email.
-     *
-     * @param Request $request
-     *
-     * @throws Exception
-     *
-     * @return void
-     */
-    public function inviteViaEmail(Request $request)
-    {
-        $request->validate([
-            'email' => ['required', 'email'],
-            'role'  => ['required', 'exists:roles,id'],
-        ]);
-
-        $team = app(RetrieveCurrentSessionTeam::class)->handle();
-        $searchInvite = TeamInvitation::query()->where('email', $request->email)->first();
-
-        if ($searchInvite || $team->hasUserWithEmail($request->email)) {
-            // resend invitation
-            $actionUrl = URL::signedRoute('teams.invitations.accept', [
-                'id' => $searchInvite->id,
-            ]);
-
-            Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl, $searchInvite));
-        }
-
-        $invitation = $team->teamInvitations()->create([
-            'email'   => $request->email,
-            'role_id' => $request->role,
-        ]);
-
-        $actionUrl = URL::signedRoute('teams.invitations.accept', [
-            'id' => $invitation->id,
-        ]);
-
-        Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl, $invitation));
-
-    }
-
-    public function resendInvitation(string $id)
-    {
-        $invitation = TeamInvitation::query()->findOrFail($id);
-        $actionUrl = URL::signedRoute('teams.invitations.accept', [
-            'id' => $id,
-        ]);
-        Mail::to($invitation->email)->queue(new TeamInvitationMail($actionUrl, $invitation));
-
-        InertiaNotification::make()
-            ->success()
-            ->title('Invitation resent')
-            ->message('The invitation has been resent successfully.')
-            ->send();
-
-        return back();
-    }
-
-    /**
-     *  Accept the invitation.
-     *
-     * @param Request $request
-     * @param string  $id
-     *
-     * @throws Exception
-     *
-     * @return JsonResponse|RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     */
-    public function inviteAccept(Request $request, string $id)
-    {
-        $invitation = TeamInvitation::query()->find($id);
-
-        if (! $invitation) {
-            return Inertia::render('Exception', [
-                'redirect' => URL::route('dashboard'),
-                'error'    => [
-                    'statusCode'    => 403,
-                    'statusMessage' => 403,
-                    'message'       => 'The invitation was not found or it has been already accepted or expired.',
-                ],
-            ])
-                ->toResponse($request)
-                ->setStatusCode(403);
-        }
-
-        if ($invitation->team->hasUserWithEmail($invitation->email)) {
-            $user = User::query()->where('email', $invitation->email)->firstOrFail();
-            $invitation->team->users()->attach($user, ['role_id' => $request->role]);
-
-            InertiaNotification::make()
-                ->success()
-                ->title('Invitation accepted')
-                ->message(__('You have accepted the invitation to join the :team team.', ['team' => $invitation->team->name]))
-                ->send();
-
-            return to_route('dashboard');
-        }
-
-        return to_route('teams.invitations.create.user', [
-            'id' => $invitation->id,
-        ]);
-
-    }
-
-    /**
-     * Create a new user page from invitation.
-     *
-     *
-     * @param string $id
-     *
-     * @return Response
-     */
-    public function createUser(string $id): InertiaResponse
-    {
-        $invitation = TeamInvitation::query()->find($id);
-
-        return Inertia::render('RegisterUserInvitation', [
-            'email'        => $invitation->email,
-            'invitationId' => $invitation->id,
-        ]);
-
-    }
-
-    /**
-     * Accept the invitation and create the user.
-     *
-     *
-     * @param RegisterRequest $request
-     * @param string          $id
-     *
-     * @throws Throwable
-     *
-     * @return RedirectResponse
-     */
-    public function store(RegisterRequest $request, string $id): RedirectResponse
-    {
-
-        $invitation = TeamInvitation::query()->findOrFail($id);
-
-        // Get the team from invitation
-        $teamInvitation = $invitation->team;
-
-        $user = app(CreateUser::class)->handle($request->validated());
-
-        // Create a personal team for the user and it will the default team
-        $personalTeam = app(CreateTeams::class)->handle(
-            user: $user,
-            attribute: [
-                'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
-                'user_id' => $user->id,
-            ], markAsDefault: true);
-
-        app(CreateRolePermission::class)->handle($personalTeam);
-
-        event(new Registered($user));
-
-        Auth::login($user);
-
-        $request->session()->regenerate();
-
-        app(CreateCurrentSessionTeam::class)->handle($personalTeam);
-
-        // Accept the invitation
-        $teamInvitation->inviteAccept($invitation->id);
-
-        InertiaNotification::make()
-            ->success()
-            ->title('Invitation accepted')
-            ->message(__('You have accepted the invitation to join the :team team.', ['team' => $teamInvitation->name]))
-            ->send();
-
-        return to_route('dashboard');
-
     }
 
     /**
@@ -242,13 +60,40 @@ class TeamsController extends Controller
         ]);
 
         $user = auth()->user();
-        $team = app(CreateTeams::class)->handle($user, [
+        $team = resolve(CreateTeams::class)->handle($user, [
             'name'    => Str::ucwords($request->name),
             'default' => $request->boolean('default'),
         ], $request->boolean('default'));
-        app(CreateRolePermission::class)->handle($team);
+        resolve(CreateRolePermission::class)->handle($team);
 
-        app(CreateCurrentSessionTeam::class)->handle($team);
+        resolve(CreateCurrentSessionTeam::class)->handle($team);
+
+        return to_route('dashboard');
+    }
+
+    /**
+     * Delete Team and its resources
+     *
+     * @param Request $request
+     *
+     * @return RedirectResponse
+     */
+    public function destroy(Request $request): RedirectResponse
+    {
+        // check if the user is deleting his owned team or not
+        $isOwnedTeam = resolve(RetrieveCurrentSessionTeam::class)->handle()->owner->id === $request->user()->id;
+        if (! $isOwnedTeam) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Team Deletion Error')
+                ->message('You can not delete a team that you do not own.')
+                ->send();
+
+            return back();
+        }
+
+        // delete the current team
+        $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
 
         return to_route('dashboard');
     }
@@ -298,7 +143,7 @@ class TeamsController extends Controller
         ]);
 
         if ($request->boolean('isMember')) {
-            $team = app(RetrieveCurrentSessionTeam::class)->handle();
+            $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
             $user = User::query()->findOrFail($id);
             $team->removeUser($user);
         } else {
@@ -326,7 +171,7 @@ class TeamsController extends Controller
     public function updateTeamMemberRole(Request $request, string $id): RedirectResponse
     {
         $request->merge([
-            'team_id' => app(RetrieveCurrentSessionTeam::class)->handle()->id,
+            'team_id' => resolve(RetrieveCurrentSessionTeam::class)->handle()->id,
         ]);
 
         $request->validate([
@@ -358,7 +203,7 @@ class TeamsController extends Controller
 
     public function getTeamRoles(): JsonResponse
     {
-        $team = app(RetrieveCurrentSessionTeam::class)->handle();
+        $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
 
         return response()->json([
             'roles' => collect($team->role)->map(fn ($role) => [
@@ -395,7 +240,7 @@ class TeamsController extends Controller
     public function getCurrentTeam(): JsonResponse
     {
         return response()->json([
-            'current_team' => app(RetrieveCurrentSessionTeam::class)->handle(),
+            'current_team' => resolve(RetrieveCurrentSessionTeam::class)->handle(),
         ]);
     }
 

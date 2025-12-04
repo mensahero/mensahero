@@ -40,7 +40,7 @@ class RegisterUserController extends Controller
                 'user_id' => $user->id,
             ], markAsDefault: true);
 
-        app(CreateRolePermission::class)->handle($teams);
+        resolve(CreateRolePermission::class)->handle($teams);
 
         event(new Registered($user));
 
@@ -48,7 +48,7 @@ class RegisterUserController extends Controller
 
         $request->session()->regenerate();
 
-        app(CreateCurrentSessionTeam::class)->handle($teams);
+        resolve(CreateCurrentSessionTeam::class)->handle($teams);
 
         return to_route('dashboard');
 
