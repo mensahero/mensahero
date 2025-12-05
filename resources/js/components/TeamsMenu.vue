@@ -93,7 +93,7 @@ onBeforeMount(async () => {
 
 const reloadTeamsAndPermissions = () => {
     router.reload({
-        only: ['permissions', 'role'],
+        only: ['auth'],
     })
 }
 

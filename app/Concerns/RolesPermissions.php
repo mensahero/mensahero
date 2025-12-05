@@ -46,7 +46,7 @@ enum RolesPermissions: string
     {
         return [
             'Teams' => [
-                'team:create', 'team:read', 'team:update', 'team:delete', 'team:invite', 'team:api',
+                'team:create', 'team:read', 'team:update', 'team:delete', 'team:remove', 'team:invite', 'team:api',
             ],
             'Contacts' => [
                 'contact:create', 'contact:read', 'contact:update', 'contact:delete',

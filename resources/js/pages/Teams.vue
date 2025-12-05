@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import DeleteTeam from '@/components/DeleteTeam.vue'
+import { usePermissions } from '@/composables/usePermissions'
 import Layout from '@/layouts/default.vue'
 import emitter from '@/lib/emitter'
 import { columns } from '@/tables/columns/teams'
@@ -82,6 +83,7 @@ const membersProps = ref<IMembers>(props.members)
 const membersData = ref<TMembersTable[]>()
 const membersInvitedData = ref<TMembersTable[]>()
 const mergeMembersTableData = ref<TMembersTable[]>()
+const { can } = usePermissions()
 
 const formTeamInfo = useForm({
     name: props.team.name,
@@ -99,7 +101,7 @@ const teamInfoSubmit = () => {
 
 const reloadProps = () => {
     router.reload({
-        only: ['teams', 'roles_permissions', 'members'],
+        only: ['teams', 'roles_permissions', 'members', 'auth'],
     })
 }
 
@@ -184,11 +186,18 @@ watch(
                         class="w-full"
                     />
                 </UFormField>
-                <UFormField label="Team Name" name="name" :error="formTeamInfo.errors.name" required>
+                <UFormField
+                    v-if="can('team:update')"
+                    label="Team Name"
+                    name="name"
+                    :error="formTeamInfo.errors.name"
+                    required
+                >
                     <UInput v-model="formTeamInfo.name" class="w-full" />
                 </UFormField>
 
                 <UButton
+                    v-if="can('team:update')"
                     :label="formTeamInfo.recentlySuccessful ? 'Saved.' : 'Save'"
                     type="submit"
                     :disabled="formTeamInfo.processing"
@@ -202,13 +211,14 @@ watch(
 
             <!--  START:  Header Section        -->
             <HeadingSmall
+                v-if="can('team:invite')"
                 title="Add Team Member"
                 description="Add a new team member to your team, allowing them to collaborate with you."
                 id="add-team-member-section"
             />
             <!--   END: Header Section        -->
 
-            <UForm class="w-5/12 space-y-6 pb-15" @submit.prevent="inviteMemberSubmit">
+            <UForm class="w-5/12 space-y-6 pb-15" v-if="can('team:invite')" @submit.prevent="inviteMemberSubmit">
                 <UFormField label="Email" name="email" :error="inviteMember.errors.email" required>
                     <UInput v-model="inviteMember.email" class="w-full" />
                 </UFormField>
@@ -225,7 +235,7 @@ watch(
                 <UButton :label="inviteMember.recentlySuccessful ? 'Invitation Sent' : 'Invite'" type="submit" />
             </UForm>
 
-            <USeparator class="w-10/12" />
+            <USeparator v-if="can('team:invite')" class="w-10/12" />
 
             <!--  Team Member Section     -->
 
@@ -277,7 +287,11 @@ watch(
             <USeparator class="w-10/12" />
 
             <!--  Delete Team Section     -->
-            <DeleteTeam :deletePasswordRequired="props.deletePasswordRequired" :isDefaultTeam="props.team.default" />
+            <DeleteTeam
+                v-if="can('team:delete')"
+                :deletePasswordRequired="props.deletePasswordRequired"
+                :isDefaultTeam="props.team.default"
+            />
         </div>
     </AppLayout>
 </template>

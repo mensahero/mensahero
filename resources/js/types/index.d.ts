@@ -3,6 +3,8 @@ import { User } from '@/types/user'
 
 export interface Auth {
     user: User
+    role: string
+    permissions: string[]
 }
 
 export interface UiColors {

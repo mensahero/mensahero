@@ -49,6 +49,27 @@ class HandleInertiaRequests extends Middleware
 
                     return $request->user() ? SessionUserResource::make($request->user()) : null;
                 },
+                'role' => function (): ?string {
+                    if (! auth()->check()) {
+                        return null;
+                    }
+
+                    $user = auth()->user();
+                    $currentTeam = $user->currentTeam();
+
+                    return $user->teamRole($currentTeam)->name;
+
+                },
+                'permissions' => function (): ?array {
+                    if (! auth()->check()) {
+                        return null;
+                    }
+
+                    $user = auth()->user();
+                    $currentTeam = $user->currentTeam();
+
+                    return $user->teamPermissions($currentTeam) ? collect($user->teamPermissions($currentTeam))->pluck('name')->toArray() : null;
+                },
             ],
         ];
     }

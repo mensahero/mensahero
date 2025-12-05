@@ -4,7 +4,9 @@ namespace App\Models\Concerns;
 
 use App\Actions\Teams\CreateCurrentSessionTeam;
 use App\Actions\Teams\RetrieveCurrentSessionTeam;
+use App\Concerns\RolesPermissions;
 use App\Models\Membership;
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Team;
 use App\Models\User;
@@ -131,7 +133,11 @@ trait HasTeams
             return null;
         }
 
-        $role = $team->users
+        if ($team->owner->id === $this->id) {
+            return Role::query()->where('name', RolesPermissions::Administrator->id())->first();
+        }
+
+        $role = $team->allUsers()
             ->where('id', $this->id)
             ->first()
             ->membership
@@ -160,15 +166,15 @@ trait HasTeams
      *
      * @param Team $team
      *
-     * @return array
+     * @return Collection|null
      */
-    public function teamPermissions(Team $team): array
+    public function teamPermissions(Team $team): ?Collection
     {
         if (! $this->belongsToTeam($team)) {
-            return [];
+            return null;
         }
 
-        return (array) $this->teamRole($team)?->permissions;
+        return $this->teamRole($team)?->permissions;
     }
 
     /**
@@ -197,7 +203,7 @@ trait HasTeams
 
         $permissions = $this->teamPermissions($team);
 
-        return in_array($permission, $permissions) ||
-            in_array('*', $permissions);
+        return $permissions && (in_array($permission, (array) $permissions) ||
+                in_array('*', (array) $permissions));
     }
 }

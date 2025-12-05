@@ -13,6 +13,7 @@ use App\Mail\Team\TeamInvitationMail;
 use App\Models\TeamInvitation;
 use App\Models\User;
 use App\Services\InertiaNotification;
+use Exception;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -35,16 +36,26 @@ class TeamInvitationController extends Controller
      *
      * @throws Exception
      *
-     * @return void
+     * @return RedirectResponse
      */
-    public function inviteViaEmail(Request $request)
+    public function inviteViaEmail(Request $request): RedirectResponse
     {
+        $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
+        if (! $request->user()->hasTeamPermission($team, 'team:invite')) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Unauthorized Action')
+                ->message('You don\'t have permission to perform this action.')
+                ->send();
+
+            return back();
+        }
+
         $request->validate([
             'email' => ['required', 'email'],
             'role'  => ['required', 'exists:roles,id'],
         ]);
 
-        $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
         $searchInvite = TeamInvitation::query()->where('email', $request->email)->first();
 
         if ($searchInvite || $team->hasUserWithEmail($request->email)) {
@@ -67,14 +78,33 @@ class TeamInvitationController extends Controller
 
         Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl, $invitation));
 
+        return to_route('teams.manage.index');
+
     }
 
-    public function resendInvitation(string $id)
+    public function resendInvitation(Request $request, string $id)
     {
+        $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
+        if (! $request->user()->hasTeamPermission($team, 'team:invite')) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Unauthorized Action')
+                ->message('You don\'t have permission to perform this action.')
+                ->send();
+
+            return back();
+        }
+
+        $request->validate([
+            'email' => ['required', 'email'],
+            'role'  => ['required', 'exists:roles,id'],
+        ]);
+
         $invitation = TeamInvitation::query()->findOrFail($id);
         $actionUrl = URL::signedRoute('teams.invitations.accept', [
             'id' => $id,
         ]);
+
         Mail::to($invitation->email)->queue(new TeamInvitationMail($actionUrl, $invitation));
 
         InertiaNotification::make()

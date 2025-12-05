@@ -76,6 +76,8 @@ class TeamsController extends Controller
      *
      * @param Request $request
      *
+     * @throws Exception
+     *
      * @return RedirectResponse
      */
     public function destroy(Request $request): RedirectResponse
@@ -85,8 +87,8 @@ class TeamsController extends Controller
         if (! $isOwnedTeam) {
             InertiaNotification::make()
                 ->error()
-                ->title('Team Deletion Error')
-                ->message('You can not delete a team that you do not own.')
+                ->title('Unauthorized Action')
+                ->message('You don\'t have permission to perform this action.')
                 ->send();
 
             return back();
@@ -108,6 +110,18 @@ class TeamsController extends Controller
      */
     public function updateTeamName(Request $request, string $id): RedirectResponse
     {
+
+        $isOwnedTeam = resolve(RetrieveCurrentSessionTeam::class)->handle()->owner->id === $request->user()->id;
+        if (! $isOwnedTeam) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Unauthorized Action')
+                ->message('You don\'t have permission to perform this action.')
+                ->send();
+
+            return back();
+        }
+
         $request->validate([
             'name' => ['required', 'string', 'max:255', Rule::unique(Team::class, 'name')->ignore($id)],
         ]);
@@ -138,6 +152,17 @@ class TeamsController extends Controller
      */
     public function removeTeamMember(Request $request, string $id): RedirectResponse
     {
+        $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
+        if (! $request->user()->hasTeamPermission($team, 'team:delete')) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Unauthorized Action')
+                ->message('You don\'t have permission to perform this action.')
+                ->send();
+
+            return back();
+        }
+
         $request->validate([
             'isMember' => ['required', 'boolean:true,false'],
         ]);
@@ -170,6 +195,17 @@ class TeamsController extends Controller
      */
     public function updateTeamMemberRole(Request $request, string $id): RedirectResponse
     {
+        $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
+        if (! $request->user()->hasTeamPermission($team, 'team:update')) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Unauthorized Action')
+                ->message('You don\'t have permission to perform this action.')
+                ->send();
+
+            return back();
+        }
+
         $request->merge([
             'team_id' => resolve(RetrieveCurrentSessionTeam::class)->handle()->id,
         ]);

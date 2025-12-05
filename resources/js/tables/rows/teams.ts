@@ -1,5 +1,6 @@
 import DeleteModal from '@/components/DeleteModal.vue'
 import UpdateTeamRoleModal from '@/components/UpdateTeamRoleModal.vue'
+import { usePermissions } from '@/composables/usePermissions'
 import emitter from '@/lib/emitter'
 import { TMembersTable } from '@/pages/Teams.vue'
 import { TEAMS_EVENTS } from '@/utils/constants'
@@ -10,6 +11,7 @@ import { lowerFirst } from 'scule'
 const overlay = useOverlay()
 const deleteActionModal = overlay.create(DeleteModal)
 const updateTeamRoleActionModal = overlay.create(UpdateTeamRoleModal)
+const { can, cannot } = usePermissions()
 
 export const teamsRows = (row: Row<TMembersTable>) => {
     return [
@@ -19,6 +21,7 @@ export const teamsRows = (row: Row<TMembersTable>) => {
         },
         {
             label: 'Update Role',
+            disabled: cannot('team:update'),
             onSelect: async () => {
                 await updateTeamRoleActionModal.open({
                     currentRole: row.original.role_id,
@@ -29,7 +32,7 @@ export const teamsRows = (row: Row<TMembersTable>) => {
         },
         {
             label: 'Resend Invite',
-            disabled: row.original.status !== 'Invited',
+            disabled: row.original.status === 'Member' || cannot('team:invite'),
             onSelect: async () => {
                 router.post(
                     route('teams.invitations.resend', row.original.id),
@@ -48,6 +51,7 @@ export const teamsRows = (row: Row<TMembersTable>) => {
         {
             label: row.original.status === 'Invited' ? 'Revoke Invite' : 'Remove User',
             color: 'error',
+            disabled: can('team:remove'),
             onSelect: async () => {
                 const form = useForm({
                     isMember: row.original.status === 'Member',
