@@ -60,6 +60,12 @@ class TeamsController extends Controller
         ]);
 
         $user = auth()->user();
+
+        // mark the other owned team as not default
+        if ($request->boolean('default')) {
+            $user->ownedTeams()->update(['default' => false]);
+        }
+
         $team = resolve(CreateTeams::class)->handle($user, [
             'name'    => Str::ucwords($request->name),
             'default' => $request->boolean('default'),
@@ -91,11 +97,37 @@ class TeamsController extends Controller
                 ->message('You don\'t have permission to perform this action.')
                 ->send();
 
-            return back();
+            return to_route('teams.manage.index');
+        }
+
+        // prevent deleting the current team if the user has only one own team
+        if (auth()->user()->ownedTeams()->count() === 1) {
+
+            InertiaNotification::make()
+                ->error()
+                ->title('Unable to delete team')
+                ->message('Please create a new team before deleting this one.')
+                ->send();
+
+            return to_route('teams.manage.index');
+        }
+
+        if (filled(auth()->user()->password)) {
+            $request->validate([
+                'current_password' => ['required', 'current_password'],
+            ]);
         }
 
         // delete the current team
         $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
+
+        if ($team->default) {
+            // make one of the team as default
+            $newDefaultTeam = $team->owner->ownedTeams()->inRandomOrder()->first()->update(['default' => true]);
+            resolve(CreateCurrentSessionTeam::class)->handle($newDefaultTeam);
+        }
+
+        $team->delete();
 
         return to_route('dashboard');
     }
@@ -119,16 +151,33 @@ class TeamsController extends Controller
                 ->message('You don\'t have permission to perform this action.')
                 ->send();
 
-            return back();
+            return to_route('teams.manage.index');
         }
 
         $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique(Team::class, 'name')->ignore($id)],
+            'name'    => ['required', 'string', 'max:255', Rule::unique(Team::class, 'name')->ignore($id)],
+            'default' => ['required', 'boolean:true,false'],
         ]);
 
         $team = Team::query()->findOrFail($id);
 
         $team->name = $request->name;
+
+        if ($team->default && ! $request->boolean('default')) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Unable to make as none default team')
+                ->message('You need to need to choose team and mark as default')
+                ->send();
+
+            return to_route('teams.manage.index');
+        }
+
+        if (! $team->default && $request->boolean('default')) {
+            $team->owner->ownedTeams()->update(['default' => false]);
+        }
+
+        $team->default = $request->boolean('default');
         $team->save();
 
         InertiaNotification::make()
@@ -160,7 +209,7 @@ class TeamsController extends Controller
                 ->message('You don\'t have permission to perform this action.')
                 ->send();
 
-            return back();
+            return to_route('teams.manage.index');
         }
 
         $request->validate([
@@ -203,7 +252,7 @@ class TeamsController extends Controller
                 ->message('You don\'t have permission to perform this action.')
                 ->send();
 
-            return back();
+            return to_route('teams.manage.index');
         }
 
         $request->merge([

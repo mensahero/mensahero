@@ -19,6 +19,7 @@ export interface Theme {
 export type AppPageProps<T extends Record<string, unknown> = Record<string, unknown>> = T & {
     name: string
     auth: Auth
+    csrf_token: string
     theme: Theme & UiColors
     notification?: Notification
 }

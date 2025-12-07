@@ -17,7 +17,9 @@ const form = useForm({
 
 const onSubmit = () => {
     form.delete(route('teams.manage.destroy.team'), {
-        onSuccess: () => form.reset('current_password'),
+        onSuccess: () => {
+            form.reset('current_password')
+        },
     })
 }
 </script>

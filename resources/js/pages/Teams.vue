@@ -87,6 +87,7 @@ const { can } = usePermissions()
 
 const formTeamInfo = useForm({
     name: props.team.name,
+    default: props.team.default,
 })
 
 const teamInfoSubmit = () => {
@@ -166,125 +167,123 @@ watch(
         <Head title="Manage Teams" />
 
         <div class="flex w-full flex-col space-y-6">
-            <!--  START:  Header Section        -->
-            <HeadingSmall
-                title="Team Name"
-                description="The team's name and owner information."
-                id="team-info-section"
-            />
-            <!--   END: Header Section        -->
+            <div id="team-info-section">
+                <!--  START:  Header Section        -->
+                <HeadingSmall title="Team Name" description="The team's name and owner information." />
+                <!--   END: Header Section        -->
 
-            <UForm class="w-5/12 space-y-6 pb-15" @submit.prevent="teamInfoSubmit">
-                <UFormField label="Team Owner" name="owner">
-                    <UUser
-                        :name="props.team.user_owner.name"
-                        :description="props.team.user_owner.email"
-                        :avatar="{
-                            src: undefined,
-                            alt: `${props.team.user_owner.name}`,
-                        }"
-                        class="w-full"
+                <UForm class="w-5/12 space-y-6 pt-5 pb-15" @submit.prevent="teamInfoSubmit">
+                    <UFormField label="Team Owner" name="owner">
+                        <UUser
+                            :name="props.team.user_owner.name"
+                            :description="props.team.user_owner.email"
+                            :avatar="{
+                                src: undefined,
+                                alt: `${props.team.user_owner.name}`,
+                            }"
+                            class="w-full"
+                        />
+                    </UFormField>
+                    <UFormField
+                        v-if="can('team:update')"
+                        label="Team Name"
+                        name="name"
+                        :error="formTeamInfo.errors.name"
+                        required
+                    >
+                        <UInput v-model="formTeamInfo.name" class="w-full" />
+                    </UFormField>
+                    <UFormField v-if="can('team:update')" label="Mark as Default" name="default">
+                        <UCheckbox icon="i-heroicons:star" v-model="formTeamInfo.default" class="w-full" />
+                    </UFormField>
+
+                    <UButton
+                        v-if="can('team:update')"
+                        :label="formTeamInfo.recentlySuccessful ? 'Saved.' : 'Save'"
+                        type="submit"
+                        :disabled="formTeamInfo.processing"
+                        :loading="formTeamInfo.processing"
                     />
-                </UFormField>
-                <UFormField
-                    v-if="can('team:update')"
-                    label="Team Name"
-                    name="name"
-                    :error="formTeamInfo.errors.name"
-                    required
-                >
-                    <UInput v-model="formTeamInfo.name" class="w-full" />
-                </UFormField>
+                </UForm>
 
-                <UButton
-                    v-if="can('team:update')"
-                    :label="formTeamInfo.recentlySuccessful ? 'Saved.' : 'Save'"
-                    type="submit"
-                    :disabled="formTeamInfo.processing"
-                    :loading="formTeamInfo.processing"
+                <USeparator class="w-10/12" />
+            </div>
+
+            <div id="add-team-member-section" v-if="can('team:invite')">
+                <!--  Add Team Member Section     -->
+
+                <!--  START:  Header Section        -->
+                <HeadingSmall
+                    title="Add Team Member"
+                    description="Add a new team member to your team, allowing them to collaborate with you."
                 />
-            </UForm>
+                <!--   END: Header Section        -->
 
-            <USeparator class="w-10/12" />
+                <UForm class="w-5/12 space-y-6 pt-5 pb-15" @submit.prevent="inviteMemberSubmit">
+                    <UFormField label="Email" name="email" :error="inviteMember.errors.email" required>
+                        <UInput v-model="inviteMember.email" class="w-full" />
+                    </UFormField>
+                    <UFormField label="Role" name="role" :error="inviteMember.errors.role" required>
+                        <URadioGroup
+                            v-model="inviteMember.role"
+                            class="w-full"
+                            color="primary"
+                            variant="table"
+                            value-key="uuid"
+                            :items="roleOptions"
+                        />
+                    </UFormField>
+                    <UButton :label="inviteMember.recentlySuccessful ? 'Invitation Sent' : 'Invite'" type="submit" />
+                </UForm>
 
-            <!--  Add Team Member Section     -->
+                <USeparator class="w-10/12" />
+                <!--  Team Member Section     -->
+            </div>
 
-            <!--  START:  Header Section        -->
-            <HeadingSmall
-                v-if="can('team:invite')"
-                title="Add Team Member"
-                description="Add a new team member to your team, allowing them to collaborate with you."
-                id="add-team-member-section"
-            />
-            <!--   END: Header Section        -->
-
-            <UForm class="w-5/12 space-y-6 pb-15" v-if="can('team:invite')" @submit.prevent="inviteMemberSubmit">
-                <UFormField label="Email" name="email" :error="inviteMember.errors.email" required>
-                    <UInput v-model="inviteMember.email" class="w-full" />
-                </UFormField>
-                <UFormField label="Role" name="role" :error="inviteMember.errors.role" required>
-                    <URadioGroup
-                        v-model="inviteMember.role"
-                        class="w-full"
-                        color="primary"
-                        variant="table"
-                        value-key="uuid"
-                        :items="roleOptions"
-                    />
-                </UFormField>
-                <UButton :label="inviteMember.recentlySuccessful ? 'Invitation Sent' : 'Invite'" type="submit" />
-            </UForm>
-
-            <USeparator v-if="can('team:invite')" class="w-10/12" />
-
-            <!--  Team Member Section     -->
-
-            <!--  START:  Header Section        -->
-            <HeadingSmall
-                title="Team Member"
-                description="All of the users that are part of this team."
-                id="team-member-section"
-            />
-            <!--   END: Header Section        -->
-            <UTable
-                class="w-10/12 shrink-0"
-                :ui="{
-                    base: 'table-fixed border-separate border-spacing-0',
-                    thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
-                    tbody: '[&>tr]:last:[&>td]:border-b-0',
-                    th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
-                    td: 'border-b border-default',
-                }"
-                :data="mergeMembersTableData"
-                :columns="columns"
-            >
-                <template #empty>
-                    <UEmpty
-                        size="sm"
-                        variant="naked"
-                        icon="i-heroicons:user-group"
-                        title="No Team Members found"
-                        description="It looks like you haven't added any members."
-                        :actions="[
-                            {
-                                icon: 'i-heroicons:envelope',
-                                label: 'Invite Member',
-                                onClick: async () => {
-                                    scrollTo('add-team-member-section')
+            <div id="team-member-section">
+                <!--  START:  Header Section        -->
+                <HeadingSmall title="Team Member" description="All of the users that are part of this team." />
+                <!--   END: Header Section        -->
+                <UTable
+                    class="w-10/12 shrink-0 pt-5"
+                    :ui="{
+                        base: 'table-fixed border-separate border-spacing-0',
+                        thead: '[&>tr]:bg-elevated/50 [&>tr]:after:content-none',
+                        tbody: '[&>tr]:last:[&>td]:border-b-0',
+                        th: 'py-2 first:rounded-l-lg last:rounded-r-lg border-y border-default first:border-l last:border-r',
+                        td: 'border-b border-default',
+                    }"
+                    :data="mergeMembersTableData"
+                    :columns="columns"
+                >
+                    <template #empty>
+                        <UEmpty
+                            size="sm"
+                            variant="naked"
+                            icon="i-heroicons:user-group"
+                            title="No Team Members found"
+                            description="It looks like you haven't added any members."
+                            :actions="[
+                                {
+                                    icon: 'i-heroicons:envelope',
+                                    label: 'Invite Member',
+                                    onClick: async () => {
+                                        scrollTo('add-team-member-section')
+                                    },
                                 },
-                            },
-                            {
-                                icon: 'i-lucide-refresh-cw',
-                                label: 'Refresh',
-                                color: 'neutral',
-                                variant: 'subtle',
-                                onClick: () => reloadProps(),
-                            },
-                        ]"
-                    />
-                </template>
-            </UTable>
-            <USeparator class="w-10/12" />
+                                {
+                                    icon: 'i-lucide-refresh-cw',
+                                    label: 'Refresh',
+                                    color: 'neutral',
+                                    variant: 'subtle',
+                                    onClick: () => reloadProps(),
+                                },
+                            ]"
+                        />
+                    </template>
+                </UTable>
+                <USeparator class="w-10/12" />
+            </div>
 
             <!--  Delete Team Section     -->
             <DeleteTeam
