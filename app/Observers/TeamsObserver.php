@@ -2,10 +2,10 @@
 
 namespace App\Observers;
 
-use Throwable;
 use App\Models\Membership;
 use App\Models\Team;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class TeamsObserver
 {

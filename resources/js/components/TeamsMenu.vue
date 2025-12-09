@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CreateTeam from '@/components/CreateTeamModal.vue'
-import emitter from '@/lib/emitter'
 import httpClient from '@/lib/axios'
+import emitter from '@/lib/emitter'
 import { TEAMS_EVENTS } from '@/utils/constants'
 import { router } from '@inertiajs/vue3'
 import type { DropdownMenuItem } from '@nuxt/ui'
