@@ -79,6 +79,7 @@ const props = defineProps<{
 }>()
 
 const roleOptions = ref<RadioGroupItem[]>(props.roles_permissions)
+const teamData = ref(props.team)
 const membersProps = ref<IMembers>(props.members)
 const membersData = ref<TMembersTable[]>()
 const membersInvitedData = ref<TMembersTable[]>()
@@ -86,8 +87,8 @@ const mergeMembersTableData = ref<TMembersTable[]>()
 const { can } = usePermissions()
 
 const formTeamInfo = useForm({
-    name: props.team.name,
-    default: props.team.default,
+    name: teamData.value.name,
+    default: teamData.value.default,
 })
 
 const teamInfoSubmit = () => {
@@ -102,7 +103,7 @@ const teamInfoSubmit = () => {
 
 const reloadProps = () => {
     router.reload({
-        only: ['teams', 'roles_permissions', 'members', 'auth'],
+        only: ['team', 'members', 'roles_permissions', 'deletePasswordRequired', 'auth'],
     })
 }
 
@@ -151,13 +152,25 @@ const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
-emitter.on('*', () => reloadProps)
+emitter.on('*', () => reloadProps())
 
 watch(
     () => props.members,
     (newMembersData) => {
         membersProps.value = newMembersData
         prepMembersTableData()
+    },
+)
+watch(
+    () => props.team,
+    (newValue) => {
+        teamData.value = newValue
+        formTeamInfo
+            .defaults({
+                name: newValue.name,
+                default: newValue.default,
+            })
+            .resetAndClearErrors()
     },
 )
 </script>
