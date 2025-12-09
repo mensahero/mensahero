@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import emitter from '@/lib/emitter'
-import apiFetch from '@/lib/ofetch'
+import apiFetch from '@/lib/axios'
 import { TEAMS_EVENTS } from '@/utils/constants'
 import { useForm } from '@inertiajs/vue3'
 import type { RadioGroupItem } from '@nuxt/ui'
@@ -51,7 +51,7 @@ const onSubmit = () => {
 onBeforeMount(async () => {
     console.log(form.role)
 
-    const rolesPermissions = (await apiFetch<{ roles: IRolesPermission[] }>(route('teams.getTeamRoles'))).roles
+    const rolesPermissions = (await apiFetch<{ roles: IRolesPermission[] }>(route('teams.getTeamRoles'))).data?.roles
     availableTeamRoles.value = rolesPermissions.map((role) => ({
         label: role.label,
         id: role.uuid,

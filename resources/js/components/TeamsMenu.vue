@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CreateTeam from '@/components/CreateTeamModal.vue'
 import emitter from '@/lib/emitter'
-import apiFetch from '@/lib/ofetch'
+import apiFetch from '@/lib/axios'
 import { TEAMS_EVENTS } from '@/utils/constants'
 import { router } from '@inertiajs/vue3'
 import type { DropdownMenuItem } from '@nuxt/ui'
@@ -42,12 +42,11 @@ const items = computed<DropdownMenuItem[][]>(() => {
             ...team,
             onSelect() {
                 selectedTeam.value = team
-                apiFetch(route('teams.switchTeam'), {
-                    method: 'POST',
-                    body: {
+                apiFetch
+                    .post(route('teams.switchTeam'), {
                         team: team.id,
-                    },
-                }).then(() => emitter.emit(TEAMS_EVENTS.SWITCH, team.id))
+                    })
+                    .then(() => emitter.emit(TEAMS_EVENTS.SWITCH, team.id))
             },
         })),
         [
@@ -71,7 +70,7 @@ const items = computed<DropdownMenuItem[][]>(() => {
 
 const retrieveTeams = async () => {
     const teamsResp = await apiFetch<ITeams[]>(route('teams.getTeamMenu'))
-    teams.value = teamsResp.map((team: ITeams) => {
+    teams.value = teamsResp.data.map((team: ITeams) => {
         return {
             ...team,
             avatar: {
