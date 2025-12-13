@@ -100,23 +100,21 @@ const reloadTeamsAndPermissions = () => {
 }
 const currentOwnerTeamDeleted = async () => {
     // refresh client information
-    reloadTeamsAndPermissions()
-
     await retrieveTeams()
-    teams.value.forEach((team) => {
-        if (team.default) {
-            selectedTeam.value = team
-            httpClient
-                .post(route('teams.switchTeam'), {
-                    team: team.id,
-                })
-                .then(() => emitter.emit(TEAMS_EVENTS.SWITCH, team.id))
-        }
-    })
-    router.visit(route('dashboard'))
+    const filteredTeams = teams.value.filter((team) => team.id !== selectedTeam.value?.id)
+    selectedTeam.value = filteredTeams.filter((team) => team.default)[0]
+    httpClient
+        .post(route('teams.switchTeam'), {
+            team: selectedTeam.value.id,
+        })
+        .then(() => {
+            emitter.emit(TEAMS_EVENTS.SWITCH, selectedTeam.value?.id)
+            router.visit(route('dashboard'))
+        })
 }
 
 emitter.on(TEAMS_EVENTS.SWITCH, () => reloadTeamsAndPermissions())
+emitter.on(TEAMS_EVENTS.DELETE, async () => await retrieveTeams())
 emitter.on(TEAMS_EVENTS.UPDATE, async () => {
     await retrieveTeams()
 })
@@ -130,10 +128,10 @@ watch(
         if (currenTeam.value) {
             echo()
                 .private(`Team.${currenTeam.value?.id}`)
-                .listen('.deleted', async (event: { team: ITeams }) => {
+                .listen('.deleted', async (event: ITeams) => {
                     // make sure that the current team that the user is not the deleted, if it is then change the team and redirect to
                     // dashboard, otherwise refresh the available team list only.
-                    if (selectedTeam.value?.id === event.team.id) {
+                    if (selectedTeam.value?.id === event.id) {
                         toast.add({
                             title: 'Team has been deleted',
                             description: 'The team that you are part of has been deleted by the owner.',

@@ -22,7 +22,7 @@ class TeamsMenuResource extends JsonResource
         return [
             'id'           => $this->id,
             'label'        => $this->name,
-            'current_team' => resolve(RetrieveCurrentSessionTeam::class)->handle()->id === $this->id,
+            'current_team' => Team::query()->where('id', session('current_team_id'))->count() && resolve(RetrieveCurrentSessionTeam::class)->handle()->id === $this->id,
             'default'      => $this->default,
         ];
     }

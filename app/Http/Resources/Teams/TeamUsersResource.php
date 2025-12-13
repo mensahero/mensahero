@@ -27,7 +27,7 @@ class TeamUsersResource extends JsonResource
             'created_at'        => $this->created_at,
             'updated_at'        => $this->updated_at,
             'is_owner'          => $this->id === $request->user()?->currentTeam()?->user_id,
-            'role_id'           => $this->teamRole(resolve(RetrieveCurrentSessionTeam::class)->handle())?->first()->id ?? null,
+            'role_id'           => $this->teamRole(resolve(RetrieveCurrentSessionTeam::class)->handle())?->id ?? null,
         ];
     }
 }

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import emitter from '@/lib/emitter'
+import { TEAMS_EVENTS } from '@/utils/constants'
 import { useForm } from '@inertiajs/vue3'
 import { ref } from 'vue'
 
@@ -18,6 +20,7 @@ const form = useForm({
 const onSubmit = () => {
     form.delete(route('teams.manage.destroy.team'), {
         onSuccess: () => {
+            emitter.emit(TEAMS_EVENTS.DELETE)
             form.reset('current_password')
         },
     })

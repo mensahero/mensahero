@@ -152,15 +152,41 @@ class TeamInvitationController extends Controller
 
         if ($invitation->team->hasUserWithEmail($invitation->email)) {
             $user = User::query()->where('email', $invitation->email)->firstOrFail();
-            $invitation->team->users()->attach($user, ['role_id' => $request->role]);
+            $invitation->team->users()->attach($user, ['role_id' => $invitation->role_id]);
+            // delete the invitation
+            $invitation->delete();
 
             InertiaNotification::make()
                 ->success()
                 ->title('Invitation accepted')
-                ->message(__('You have accepted the invitation to join the :team team.', ['team' => $invitation->team->name]))
+                ->message(__('Great! You have accepted the invitation to join the :team team.', ['team' => $invitation->team->name]))
                 ->send();
 
             return to_route('dashboard');
+        }
+
+        if ($user = User::query()->where('email', $invitation->email)->first()) {
+            $invitation->team->users()->attach($user, ['role_id' =>  $invitation->role_id]);
+            InertiaNotification::make()
+                ->success()
+                ->title('Invitation accepted')
+                ->message(__('Great! You have accepted the invitation to join the :team team.', ['team' => $invitation->team->name]))
+                ->send();
+
+            // delete the invitation
+            $invitation->delete();
+
+            return to_route('dashboard');
+        }
+
+        if (auth()->check()) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Unauthorized Action')
+                ->message('You are currently logged in as a different user. Please logout and try again.')
+                ->send();
+
+            return back();
         }
 
         return redirect()->temporarySignedRoute('teams.invitations.create.user', now()->addMinutes(30), [

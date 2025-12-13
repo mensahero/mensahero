@@ -101,7 +101,7 @@
         ],
         "dev": [
             "Composer\\Config::disableProcessTimeout",
-            "bunx concurrently \"composer mailpit\" \"composer reverb\" \"php artisan queue:listen --tries=1\" \"php artisan schedule:work\" \"bun run dev\" --names=mailserver,reverb,queue,scheduler,vite --kill-others  -c auto"
+            "bunx --bun concurrently \"composer mailpit\" \"composer reverb\" \"@php artisan queue:listen --tries=1\" \"@php artisan schedule:work\" \"bun run dev\" --names=mailserver,reverb,queue,scheduler,vite --kill-others --prefix name -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" "
         ],
         "format:be": [
             "vendor/bin/pint"
@@ -116,7 +116,11 @@
         ],
         "reverb": [
             "Composer\\Config::disableProcessTimeout",
-            "php artisan reverb:start"
+            "@php artisan reverb:start --debug"
+        ],
+        "queue": [
+            "Composer\\Config::disableProcessTimeout",
+            "@php artisan queue:listen --tries=1"
         ],
         "mailpit": [
             "Composer\\Config::disableProcessTimeout",
@@ -139,11 +143,11 @@
         "playwright:install": [
             "echo Installing Playwright.",
             "bun install playwright@latest",
-            "bunx playwright install"
+            "bunx --bun playwright install"
         ],
         "playwright:cleanup": [
             "echo Cleaning up Playwright.",
-            "bunx playwright uninstall --all"
+            "bunx --bun playwright uninstall --all"
         ],
         "test:browser": [
             "php artisan test --testsuite=Browser --bail"

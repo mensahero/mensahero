@@ -141,7 +141,7 @@ trait HasTeams
             ->where('id', $this->id)
             ->first()
             ->membership
-            ->role;
+            ->role_id;
 
         return $role ? Role::query()->find($role) : null;
     }

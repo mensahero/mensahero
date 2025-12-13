@@ -2,6 +2,7 @@
 import emitter from '@/lib/emitter'
 import { TEAMS_EVENTS } from '@/utils/constants'
 import { useForm } from '@inertiajs/vue3'
+import { capitalCase } from 'text-case'
 
 defineProps<{
     title?: string
@@ -44,7 +45,13 @@ const onSubmit = () => {
         <template #body>
             <UForm class="w-full space-y-6" @submit.prevent="onSubmit">
                 <UFormField name="name" label="Team Name" :error="form.errors.name" required>
-                    <UInput v-model="form.name" placeholder="Team Name" class="w-full" autofocus />
+                    <UInput
+                        v-model="form.name"
+                        placeholder="Team Name"
+                        class="w-full"
+                        autofocus
+                        @change="(e: any) => (e.target.value = capitalCase(e.target.value))"
+                    />
                 </UFormField>
                 <UFormField name="default" label="Mark as Default?">
                     <UCheckbox v-model="form.default" />

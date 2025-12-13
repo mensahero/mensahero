@@ -127,11 +127,13 @@ const inviteMemberSubmit = () => {
 }
 
 const prepMembersTableData = () => {
-    membersData.value = membersProps.value.members.data.map((member) => ({
-        ...member,
-        status: 'Member',
-        role: props.roles_permissions.find((role) => role.uuid === member.role_id)?.label ?? 'N/A',
-    }))
+    membersData.value = membersProps.value.members.data.map((member) => {
+        return {
+            ...member,
+            status: 'Member',
+            role: props.roles_permissions.find((role) => role.uuid === member.role_id)?.label ?? 'N/A',
+        }
+    })
 
     membersInvitedData.value = membersProps.value.invited.data.map((inviteMember) => ({
         ...inviteMember,
@@ -161,6 +163,10 @@ watch(
         membersProps.value = newMembersData
         prepMembersTableData()
     },
+    {
+        immediate: true,
+        deep: true,
+    },
 )
 watch(
     () => props.team,
@@ -172,6 +178,10 @@ watch(
                 default: newValue.default,
             })
             .resetAndClearErrors()
+    },
+    {
+        immediate: true,
+        deep: true,
     },
 )
 </script>

@@ -6,6 +6,7 @@ import emitter from '@/lib/emitter'
 import { contactColumns } from '@/tables/columns/contacts'
 import { IContact } from '@/types/contacts/contacts'
 import { IModelResource } from '@/types/modelResource'
+import { TEAMS_EVENTS } from '@/utils/constants'
 import { Head, router, useForm } from '@inertiajs/vue3'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import { watchDebounced } from '@vueuse/core'
@@ -159,7 +160,7 @@ watchDebounced(
 )
 
 // if the user changes the teams, we need to refresh the user context and its contacts list
-emitter.on('teams:switch', () => reloadInertiaPage())
+emitter.on(TEAMS_EVENTS.SWITCH, () => reloadInertiaPage())
 </script>
 
 <template>

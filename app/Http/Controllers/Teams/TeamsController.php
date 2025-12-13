@@ -72,6 +72,12 @@ class TeamsController extends Controller
 
         resolve(CreateCurrentSessionTeam::class)->handle($team);
 
+        InertiaNotification::make()
+            ->success()
+            ->title('Team Created')
+            ->message('The team has been created successfully.')
+            ->send();
+
         return to_route('dashboard');
     }
 
@@ -123,9 +129,13 @@ class TeamsController extends Controller
             // make one of the team as default
             $newDefaultTeam = $team->owner->ownedTeams()->inRandomOrder()->first()->update(['default' => true]);
             resolve(CreateCurrentSessionTeam::class)->handle($newDefaultTeam);
+        } else {
+            $randomTeam = $team->owner->allTeams()->random()->first();
+
+            resolve(CreateCurrentSessionTeam::class)->handle($randomTeam);
         }
 
-        broadcast(new TeamDeletedEvent($team))->toOthers();
+        broadcast(new TeamDeletedEvent($team->toArray()))->toOthers();
 
         $team->delete();
 

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Controllers\Teams\TeamsController;
+use App\Http\Middleware\HandleInertiaRequests;
 
 Route::prefix('teams')->group(function () {
     Route::get('/user/invitation/{id}', [TeamInvitationController::class, 'createUser'])
@@ -58,9 +59,11 @@ Route::middleware('auth')->prefix('teams')->group(function () {
         ->name('teams.getAllTeams');
 
     Route::get('/getTeamMenu', [TeamsController::class, 'getTeamMenus'])
+        ->withoutMiddleware([HandleInertiaRequests::class])
         ->name('teams.getTeamMenu');
 
     Route::post('/session/team', [TeamsController::class, 'setCurrentTeam'])
+        ->withoutMiddleware([HandleInertiaRequests::class])
         ->name('teams.switchTeam');
 
     Route::get('/session/team', [TeamsController::class, 'getCurrentTeam'])
