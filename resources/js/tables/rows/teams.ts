@@ -6,7 +6,7 @@ import { TMembersTable } from '@/pages/Teams.vue'
 import { TEAMS_EVENTS } from '@/utils/constants'
 import { router, useForm } from '@inertiajs/vue3'
 import type { Row } from '@tanstack/table-core'
-import { lowerFirst } from 'scule'
+import { lowerCase } from 'text-case'
 
 const overlay = useOverlay()
 const deleteActionModal = overlay.create(DeleteModal)
@@ -25,7 +25,7 @@ export const teamsRows = (row: Row<TMembersTable>) => {
             onSelect: async () => {
                 await updateTeamRoleActionModal.open({
                     currentRole: row.original.role_id,
-                    teamMemberFlag: lowerFirst(row.original.status),
+                    teamMemberFlag: lowerCase(row.original.status),
                     teamMemberId: row.original.id,
                 }).result
             },

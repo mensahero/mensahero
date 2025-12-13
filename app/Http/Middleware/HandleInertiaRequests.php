@@ -43,7 +43,6 @@ class HandleInertiaRequests extends Middleware
             ...parent::share($request),
             'name'         => config('app.name'),
             'notification' => $request->session()->get('notification'),
-            'csrf_token'   => $request->session()->token(),
             'auth'         => [
                 'user' => function () use ($request) {
                     $request->user()?->refresh(); // reload and use the latest data

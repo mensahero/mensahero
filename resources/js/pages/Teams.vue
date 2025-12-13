@@ -9,6 +9,7 @@ import { User } from '@/types/user'
 import { TEAMS_EVENTS } from '@/utils/constants'
 import { Head, router, useForm } from '@inertiajs/vue3'
 import type { RadioGroupItem } from '@nuxt/ui'
+import { capitalCase } from 'text-case'
 import { onMounted, ref, watch } from 'vue'
 
 defineOptions({ layout: Layout })
@@ -204,7 +205,11 @@ watch(
                         :error="formTeamInfo.errors.name"
                         required
                     >
-                        <UInput v-model="formTeamInfo.name" class="w-full" />
+                        <UInput
+                            v-model="formTeamInfo.name"
+                            @blur="(e: any) => (e.target.value = capitalCase(e.target.value))"
+                            class="w-full"
+                        />
                     </UFormField>
                     <UFormField v-if="can('team:update')" label="Mark as Default" name="default">
                         <UCheckbox icon="i-heroicons:star" v-model="formTeamInfo.default" class="w-full" />

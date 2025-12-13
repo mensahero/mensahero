@@ -21,7 +21,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Inertia\Response as InertiaResponse;
@@ -60,9 +59,11 @@ class TeamInvitationController extends Controller
 
         if ($searchInvite || $team->hasUserWithEmail($request->email)) {
             // resend invitation
-            $actionUrl = URL::signedRoute('teams.invitations.accept', [
-                'id' => $searchInvite->id,
-            ]);
+            $actionUrl = URL::temporarySignedRoute('teams.invitations.accept',
+                now()->addMinutes(15),
+                [
+                    'id' => $searchInvite->id,
+                ]);
 
             Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl, $searchInvite));
         }
@@ -72,9 +73,15 @@ class TeamInvitationController extends Controller
             'role_id' => $request->role,
         ]);
 
-        $actionUrl = URL::signedRoute('teams.invitations.accept', [
+        $actionUrl = URL::temporarySignedRoute('teams.invitations.accept', now()->addMinutes(15), [
             'id' => $invitation->id,
         ]);
+
+        InertiaNotification::make()
+            ->success()
+            ->title('Invitation Sent')
+            ->message('The invitation has been sent successfully.')
+            ->send();
 
         Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl, $invitation));
 
@@ -156,7 +163,7 @@ class TeamInvitationController extends Controller
             return to_route('dashboard');
         }
 
-        return to_route('teams.invitations.create.user', [
+        return redirect()->temporarySignedRoute('teams.invitations.create.user', now()->addMinutes(30), [
             'id' => $invitation->id,
         ]);
 
@@ -206,7 +213,7 @@ class TeamInvitationController extends Controller
         $personalTeam = resolve(CreateTeams::class)->handle(
             user: $user,
             attribute: [
-                'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
+                'name'    => $request->team,
                 'user_id' => $user->id,
             ], markAsDefault: true);
 
@@ -221,12 +228,15 @@ class TeamInvitationController extends Controller
         resolve(CreateCurrentSessionTeam::class)->handle($personalTeam);
 
         // Accept the invitation
-        $teamInvitation->inviteAccept($invitation->id);
+        $teamInvitation->acceptInvitation($user->email, $invitation->role_id);
+
+        // delete the invitation
+        $invitation->delete();
 
         InertiaNotification::make()
             ->success()
             ->title('Invitation accepted')
-            ->message(__('You have accepted the invitation to join the :team team.', ['team' => $teamInvitation->name]))
+            ->message(__('Great! You have accepted the invitation to join the :team team.', ['team' => $teamInvitation->name]))
             ->send();
 
         return to_route('dashboard');

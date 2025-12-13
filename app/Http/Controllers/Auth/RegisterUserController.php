@@ -11,7 +11,6 @@ use App\Http\Requests\Auth\RegisterRequest;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
@@ -36,7 +35,7 @@ class RegisterUserController extends Controller
         $teams = $this->createTeams->handle(
             user: $user,
             attribute: [
-                'name'    => Str::possessive(Str::of($user->name)->trim()->explode(' ')->first()),
+                'name'    => $request->team,
                 'user_id' => $user->id,
             ], markAsDefault: true);
 

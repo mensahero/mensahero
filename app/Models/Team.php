@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Actions\Teams\AddTeamMember;
 use App\Observers\TeamsObserver;
+use Exception;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -132,5 +134,20 @@ class Team extends Model
     public function removeUser($user)
     {
         $this->users()->detach($user);
+    }
+
+    /**
+     * Accept the given user invitation for the team.
+     *
+     * @param $email
+     * @param $role
+     *
+     * @throws Exception
+     *
+     * @return void
+     */
+    public function acceptInvitation($email, $role): void
+    {
+        resolve(AddTeamMember::class)->handle($this, $email, $role);
     }
 }

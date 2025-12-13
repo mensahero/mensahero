@@ -9,7 +9,7 @@ import { IModelResource } from '@/types/modelResource'
 import { Head, router, useForm } from '@inertiajs/vue3'
 import { getPaginationRowModel } from '@tanstack/table-core'
 import { watchDebounced } from '@vueuse/core'
-import { upperFirst } from 'scule'
+import { upperCase } from 'text-case'
 import { onMounted, onUnmounted, ref, resolveComponent, useTemplateRef, watch } from 'vue'
 import { route } from 'ziggy-js'
 
@@ -281,7 +281,7 @@ emitter.on('teams:switch', () => reloadInertiaPage())
                                                 :items="[
                                                     { label: 'All', value: 'all' },
                                                     ...props.countryCodes.map((code) => ({
-                                                        label: upperFirst(code),
+                                                        label: upperCase(code),
                                                         value: code,
                                                     })),
                                                 ]"
@@ -299,7 +299,7 @@ emitter.on('teams:switch', () => reloadInertiaPage())
                                                 :items="[
                                                     { label: 'All', value: 'all' },
                                                     ...props.sourceTypes.map((source) => ({
-                                                        label: upperFirst(source),
+                                                        label: upperCase(source),
                                                         value: source,
                                                     })),
                                                 ]"
@@ -322,7 +322,7 @@ emitter.on('teams:switch', () => reloadInertiaPage())
                                     ?.getAllColumns()
                                     .filter((column) => column.getCanHide())
                                     .map((column) => ({
-                                        label: upperFirst(column.columnDef.header as string),
+                                        label: upperCase(column.columnDef.header as string),
                                         type: 'checkbox' as const,
                                         checked: column.getIsVisible(),
                                         onUpdateChecked(checked: boolean) {

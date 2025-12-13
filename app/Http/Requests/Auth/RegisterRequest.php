@@ -5,6 +5,7 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rules\Password;
+use Override;
 
 class RegisterRequest extends FormRequest
 {
@@ -17,7 +18,8 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name'     => ['required', 'string', 'max:255', 'min:3'],
-            'email'    => ['required', 'string', 'disposable_email', 'email:rfc,dns,spoof,strict', 'max:255', 'unique:users'],
+            'team'     => ['required', 'string', 'max:255', 'unique:teams,name'],
+            'email'    => ['required', 'string', 'lowercase', 'disposable_email', 'email:rfc,dns,spoof,strict', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed',
                 Password::min(8)
                     ->letters()
@@ -34,11 +36,21 @@ class RegisterRequest extends FormRequest
     {
         return [
             'name'     => ['required', 'string', 'max:255', 'min:3'],
-            'email'    => ['required', 'string',  'email', 'max:255', 'unique:users'],
+            'team'     => ['required', 'string', 'max:255', 'unique:teams,name'],
+            'email'    => ['required', 'string', 'lowercase',  'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed',
                 Password::min(8),
             ],
             'password_confirmation' => ['required'],
+        ];
+    }
+
+    #[Override]
+    public function messages(): array
+    {
+        return [
+            ...parent::messages(),
+            'team.exists' => 'Try again a different team name.',
         ];
     }
 }

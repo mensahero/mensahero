@@ -2,6 +2,7 @@
 import UPasswordInput from '@/components/ui/UPasswordInput.vue'
 import Layout from '@/layouts/auth.vue'
 import { Head, useForm } from '@inertiajs/vue3'
+import { capitalCase } from 'text-case'
 
 defineOptions({ layout: Layout })
 
@@ -13,6 +14,7 @@ const props = defineProps<{
 const form = useForm({
     name: '',
     email: props.email,
+    team: '',
     password: '',
     password_confirmation: '',
 })
@@ -21,7 +23,7 @@ const onSubmit = () => {
     form.clearErrors()
     form.defaults('email', props.email)
 
-    form.post(route('teams.invitations.store.user'), {
+    form.post(route('teams.invitations.store.user', props.invitationId), {
         onSuccess: () => {
             form.reset()
         },
@@ -53,13 +55,28 @@ const onSubmit = () => {
 
             <!--  START:  Form Section       -->
             <div class="flex flex-col gap-y-6">
-                <UForm class="space-y-5" @submit.prevent="onSubmit">
+                <UForm class="space-y-5" @submit="onSubmit">
                     <UFormField label="Name" name="name" :error="form.errors.name" required>
-                        <UInput class="w-full" v-model="form.name" placeholder="Enter your name" autofocus />
+                        <UInput
+                            class="w-full"
+                            v-model="form.name"
+                            placeholder="Enter your name"
+                            @blur="(e: any) => (e.target.value = capitalCase(e.target.value))"
+                            autofocus
+                        />
                     </UFormField>
 
                     <UFormField label="Email" name="email" :error="form.errors.email" required>
                         <UInput class="w-full" v-model="form.email" placeholder="Enter your email" disabled />
+                    </UFormField>
+
+                    <UFormField label="Team Name" name="team" :error="form.errors.team" required>
+                        <UInput
+                            class="w-full"
+                            v-model="form.team"
+                            placeholder="Create your own personal team"
+                            @blur="(e: any) => (e.target.value = capitalCase(e.target.value))"
+                        />
                     </UFormField>
 
                     <UPasswordInput v-model="form.password" label="Password" :error="form.errors.password" required />
