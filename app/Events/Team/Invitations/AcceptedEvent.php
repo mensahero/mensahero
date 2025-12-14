@@ -1,20 +1,19 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Team\Invitations;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
-use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class TeamDeletedEvent implements ShouldBroadcast, ShouldRescue
+class AcceptedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public function __construct(public readonly array $team) {}
+    public function __construct(public readonly object $team) {}
 
     /**
      * Get the channels the event should broadcast on.
@@ -28,18 +27,18 @@ class TeamDeletedEvent implements ShouldBroadcast, ShouldRescue
         ];
     }
 
+    public function broadcastAs(): string
+    {
+        return 'invitation.accepted';
+    }
+
     public function broadcastWith(): array
     {
         return [
-            'id'           => $this->team['id'],
-            'label'        => $this->team['name'],
-            'current_team' => false,
-            'default'      => $this->team['default'],
+            'team' => [
+                'id'   => $this->team['id'],
+                'name' => $this->team['name'],
+            ],
         ];
-    }
-
-    public function broadcastAs(): string
-    {
-        return 'deleted';
     }
 }

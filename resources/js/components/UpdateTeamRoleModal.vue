@@ -49,8 +49,6 @@ const onSubmit = () => {
 }
 
 onBeforeMount(async () => {
-    console.log(form.role)
-
     const rolesPermissions = (await httpClient<{ roles: IRolesPermission[] }>(route('teams.getTeamRoles'))).data?.roles
     availableTeamRoles.value = rolesPermissions.map((role) => ({
         label: role.label,

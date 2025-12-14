@@ -7,9 +7,12 @@ use App\Actions\Teams\CreateRolePermission;
 use App\Actions\Teams\CreateTeams;
 use App\Actions\Teams\RetrieveCurrentSessionTeam;
 use App\Concerns\RolesPermissions;
-use App\Events\TeamDeletedEvent;
+use App\Events\Team\TeamDeletedEvent;
+use App\Events\Team\UpdatedEvent;
+use App\Events\Team\UserRemovedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Team\CreateTeamRequest;
+use App\Http\Requests\Team\UpdateTeamMemberRoleRequest;
 use App\Http\Requests\Team\UpdateTeamNameRequest;
 use App\Http\Resources\Teams\InvitationMemberResource;
 use App\Http\Resources\Teams\TeamResource;
@@ -185,6 +188,8 @@ class TeamsController extends Controller
         $team->default = $request->boolean('default');
         $team->save();
 
+        broadcast(new UpdatedEvent($team))->toOthers();
+
         InertiaNotification::make()
             ->success()
             ->title('Team Name Updated')
@@ -217,6 +222,16 @@ class TeamsController extends Controller
             return to_route('teams.manage.index');
         }
 
+        if ($id === auth()->user()->id) {
+            InertiaNotification::make()
+                ->error()
+                ->title('Unable to remove yourself from the team')
+                ->message('You can\'t remove yourself from the team.')
+                ->send();
+
+            return back();
+        }
+
         $request->validate([
             'isMember' => ['required', 'boolean:true,false'],
         ]);
@@ -225,6 +240,7 @@ class TeamsController extends Controller
             $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
             $user = User::query()->findOrFail($id);
             $team->removeUser($user);
+            broadcast(new UserRemovedEvent($team->toArray(), $user))->toOthers();
         } else {
             $invitation = TeamInvitation::query()->findOrFail($id);
             $invitation->delete();
@@ -247,32 +263,25 @@ class TeamsController extends Controller
      *
      * @return RedirectResponse
      */
-    public function updateTeamMemberRole(Request $request, string $id): RedirectResponse
+    public function updateTeamMemberRole(UpdateTeamMemberRoleRequest $request, string $id): RedirectResponse
     {
-        $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
-        if (! $request->user()->hasTeamPermission($team, 'team:update')) {
-            InertiaNotification::make()
-                ->error()
-                ->title('Unauthorized Action')
-                ->message('You don\'t have permission to perform this action.')
-                ->send();
 
+        if (! $request->ensureIsNotOwnRecord() || ! $request->ensureHavePermission()) {
             return to_route('teams.manage.index');
         }
-
-        $request->merge([
-            'team_id' => resolve(RetrieveCurrentSessionTeam::class)->handle()->id,
-        ]);
-
-        $request->validate([
-            'role'           => ['required', 'exists:roles,id'],
-            'team_id'        => ['required', 'exists:teams,id'],
-            'isMember'       => ['required', 'boolean:true,false'],
-        ]);
 
         if ($request->boolean('isMember')) {
             $team = Team::query()->findOrFail($request->team_id);
             $team->users()->updateExistingPivot($id, ['role_id' => $request->role]);
+
+            InertiaNotification::make()
+                ->success()
+                ->title('Role Updated')
+                ->message('The role has been updated successfully.')
+                ->send();
+
+            return to_route('teams.manage.index');
+
         }
 
         $invitation = TeamInvitation::query()->findOrFail($id);

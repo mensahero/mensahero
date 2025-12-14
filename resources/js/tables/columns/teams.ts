@@ -7,10 +7,12 @@ import UButton from '@nuxt/ui/runtime/components/Button.vue'
 import UDropdownMenu from '@nuxt/ui/runtime/components/DropdownMenu.vue'
 import dayjs from 'dayjs'
 import advancedFormat from 'dayjs/plugin/advancedFormat'
+import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { h } from 'vue'
 
 dayjs.extend(utc)
+dayjs.extend(timezone)
 dayjs.extend(advancedFormat)
 
 export const columns: TableColumn<TMembersTable>[] = [
@@ -18,7 +20,11 @@ export const columns: TableColumn<TMembersTable>[] = [
         accessorKey: 'created_at',
         header: 'Date Joined / Invited',
         cell: ({ row }) => {
-            return dayjs(row.getValue('created_at')).format('MMM DD, YYYY | hh:mm A')
+            const timestamp = row.getValue('created_at') as string
+            const userTimezone = dayjs.tz.guess()
+            const createdAt = dayjs(timestamp).tz(userTimezone).format('MMM DD, YYYY | hh:mm A')
+
+            return createdAt
         },
     },
     {

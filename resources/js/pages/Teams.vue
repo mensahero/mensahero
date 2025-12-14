@@ -8,6 +8,7 @@ import { ITeam } from '@/types/teams'
 import { User } from '@/types/user'
 import { TEAMS_EVENTS } from '@/utils/constants'
 import { Head, router, useForm } from '@inertiajs/vue3'
+import { echo } from '@laravel/echo-vue'
 import type { RadioGroupItem } from '@nuxt/ui'
 import { capitalCase } from 'text-case'
 import { onMounted, ref, watch } from 'vue'
@@ -184,6 +185,11 @@ watch(
         deep: true,
     },
 )
+
+echo()
+    .private(`Team.${props.team.id}`)
+    .listen('.invitation.accepted', () => reloadProps())
+    .listen('.team.updated', () => reloadProps())
 </script>
 
 <template>

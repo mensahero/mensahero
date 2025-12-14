@@ -201,9 +201,9 @@ trait HasTeams
             return false;
         }
 
-        $permissions = $this->teamPermissions($team);
+        $permissions = collect($this->teamPermissions($team)->toArray());
 
-        return $permissions && (in_array($permission, (array) $permissions) ||
-                in_array('*', (array) $permissions));
+        return in_array($permission, $permissions->pluck('name')->flatten()->toArray()) ||
+                in_array('*', (array) $permissions);
     }
 }

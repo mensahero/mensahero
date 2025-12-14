@@ -2,8 +2,9 @@
 import CreateTeam from '@/components/CreateTeamModal.vue'
 import httpClient from '@/lib/axios'
 import emitter from '@/lib/emitter'
+import { User } from '@/types/user'
 import { TEAMS_EVENTS } from '@/utils/constants'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import { echo } from '@laravel/echo-vue'
 import type { DropdownMenuItem } from '@nuxt/ui'
 import { computed, onBeforeMount, ref, watch } from 'vue'
@@ -31,11 +32,18 @@ interface ITeamsMenu {
     onSelect?: () => void
 }
 
+interface ITeamUserRemoved {
+    team: ITeams
+    user: User
+}
+
 const toast = useToast()
 const teams = ref<ITeamsMenu[]>([])
 const overlay = useOverlay()
 const createTeamModalAction = overlay.create(CreateTeam)
 const selectedTeam = ref<ITeamsMenu>()
+const page = usePage()
+const auth = page.props.auth
 
 const items = computed<DropdownMenuItem[][]>(() => {
     return [
@@ -99,16 +107,15 @@ const reloadTeamsAndPermissions = () => {
     })
 }
 const currentOwnerTeamDeleted = async () => {
-    // refresh client information
-    await retrieveTeams()
     const filteredTeams = teams.value.filter((team) => team.id !== selectedTeam.value?.id)
     selectedTeam.value = filteredTeams.filter((team) => team.default)[0]
     httpClient
         .post(route('teams.switchTeam'), {
             team: selectedTeam.value.id,
         })
-        .then(() => {
+        .then(async () => {
             emitter.emit(TEAMS_EVENTS.SWITCH, selectedTeam.value?.id)
+            await retrieveTeams()
             router.visit(route('dashboard'))
         })
 }
@@ -128,6 +135,25 @@ watch(
         if (currenTeam.value) {
             echo()
                 .private(`Team.${currenTeam.value?.id}`)
+                .listen('.team.updated', async () => {
+                    await retrieveTeams(false)
+                    // update the selected team data
+                    selectedTeam.value = teams.value.filter((team) => team.id === selectedTeam.value?.id)[0]
+                })
+                .listen('.user.removed', async (event: ITeamUserRemoved) => {
+                    if (selectedTeam.value?.id === event.team.id && auth.user.id === event.user.id) {
+                        toast.add({
+                            title: 'You have been removed as a member',
+                            description: `You don't have anymore an access to the current ${event.team.label} team.`,
+                            color: 'warning',
+                            icon: 'i-lucide:triangle-alert',
+                        })
+                        await currentOwnerTeamDeleted()
+                    } else {
+                        reloadTeamsAndPermissions()
+                        await retrieveTeams(false)
+                    }
+                })
                 .listen('.deleted', async (event: ITeams) => {
                     // make sure that the current team that the user is not the deleted, if it is then change the team and redirect to
                     // dashboard, otherwise refresh the available team list only.

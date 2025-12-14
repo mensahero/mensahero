@@ -7,6 +7,7 @@ use App\Actions\Teams\CreateRolePermission;
 use App\Actions\Teams\CreateTeams;
 use App\Actions\Teams\RetrieveCurrentSessionTeam;
 use App\Actions\User\CreateUser;
+use App\Events\Team\Invitations\AcceptedEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Mail\Team\TeamInvitationMail;
@@ -65,6 +66,13 @@ class TeamInvitationController extends Controller
                     'id' => $searchInvite->id,
                 ]);
 
+            InertiaNotification::make()
+                ->success()
+                ->icon('i-lucide:mail-check')
+                ->title('Invitation Sent')
+                ->message('The invitation has been resent successfully.')
+                ->send();
+
             Mail::to($request->email)->queue(new TeamInvitationMail($actionUrl, $searchInvite));
         }
 
@@ -79,6 +87,7 @@ class TeamInvitationController extends Controller
 
         InertiaNotification::make()
             ->success()
+            ->icon('i-lucide:mail-check')
             ->title('Invitation Sent')
             ->message('The invitation has been sent successfully.')
             ->send();
@@ -153,6 +162,9 @@ class TeamInvitationController extends Controller
         if ($invitation->team->hasUserWithEmail($invitation->email)) {
             $user = User::query()->where('email', $invitation->email)->firstOrFail();
             $invitation->team->users()->attach($user, ['role_id' => $invitation->role_id]);
+
+            broadcast(new AcceptedEvent($invitation->team))->toOthers();
+
             // delete the invitation
             $invitation->delete();
 
@@ -172,6 +184,8 @@ class TeamInvitationController extends Controller
                 ->title('Invitation accepted')
                 ->message(__('Great! You have accepted the invitation to join the :team team.', ['team' => $invitation->team->name]))
                 ->send();
+
+            broadcast(new AcceptedEvent($invitation->team))->toOthers();
 
             // delete the invitation
             $invitation->delete();
@@ -255,6 +269,8 @@ class TeamInvitationController extends Controller
 
         // Accept the invitation
         $teamInvitation->acceptInvitation($user->email, $invitation->role_id);
+
+        broadcast(new AcceptedEvent($invitation->team))->toOthers();
 
         // delete the invitation
         $invitation->delete();

@@ -53,9 +53,11 @@ Route::middleware('auth')->prefix('teams')->group(function () {
     });
 
     Route::get('/getTeamRoles', [TeamsController::class, 'getTeamRoles'])
+        ->withoutMiddleware([HandleInertiaRequests::class])
         ->name('teams.getTeamRoles');
 
     Route::get('/getAllTeams', [TeamsController::class, 'getTeams'])
+        ->withoutMiddleware([HandleInertiaRequests::class])
         ->name('teams.getAllTeams');
 
     Route::get('/getTeamMenu', [TeamsController::class, 'getTeamMenus'])
@@ -67,6 +69,7 @@ Route::middleware('auth')->prefix('teams')->group(function () {
         ->name('teams.switchTeam');
 
     Route::get('/session/team', [TeamsController::class, 'getCurrentTeam'])
+        ->withoutMiddleware([HandleInertiaRequests::class])
         ->name('teams.getCurrentTeam');
 
 });
