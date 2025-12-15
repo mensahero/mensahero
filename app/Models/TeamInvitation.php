@@ -16,6 +16,7 @@ class TeamInvitation extends Model
      * @var array
      */
     protected $fillable = [
+        'team_id',
         'email',
         'role_id',
     ];
