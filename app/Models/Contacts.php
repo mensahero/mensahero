@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Lacodix\LaravelModelFilter\Traits\HasFilters;
 use Lacodix\LaravelModelFilter\Traits\IsSearchable;
+use Mattiverse\Userstamps\Traits\Userstamps;
 
 #[ScopedBy([UserContactsScope::class])]
 class Contacts extends Model
@@ -20,6 +21,7 @@ class Contacts extends Model
     use HasFilters;
     use HasUuids;
     use IsSearchable;
+    use Userstamps;
 
     protected array $searchable = [
         'name',

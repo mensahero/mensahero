@@ -2,6 +2,7 @@
 
 namespace App\Models\Scopes\Contacts;
 
+use App\Concerns\TeamSessionKeys;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -18,6 +19,9 @@ class UserContactsScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        $builder->where('team_id', session('current_team_id'));
+        // apply only if the authenticated user is on a web session
+        if (session()->has(TeamSessionKeys::CURRENT_TEAM_ID->key())) {
+            $builder->where('team_id', session(TeamSessionKeys::CURRENT_TEAM_ID->key()));
+        }
     }
 }

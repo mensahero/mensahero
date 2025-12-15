@@ -6,6 +6,7 @@ use App\Actions\Modules\Contacts\CreateContacts;
 use App\Actions\Modules\Contacts\DeleteContacts;
 use App\Concerns\ContactSources;
 use App\Concerns\MobileCountryCode;
+use App\Concerns\TeamSessionKeys;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Module\ContactsRequest;
 use App\Http\Resources\Module\ContactResource;
@@ -66,7 +67,7 @@ class ContactsController extends Controller
             ...$request->validated(),
             'mobile'  => $formattedMobile,
             'user_id' => auth()->user()->id,
-            'team_id' => session('current_team_id'),
+            'team_id' => session(TeamSessionKeys::CURRENT_TEAM_ID->key()),
         ]);
 
         InertiaNotification::make()

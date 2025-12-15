@@ -19,6 +19,7 @@ return new class extends Migration
                 ->index()
                 ->comment('source of the contact, if imported from devices or other.')
                 ->nullable();
+            $table->userstamps();
             $table->timestamps();
         });
     }

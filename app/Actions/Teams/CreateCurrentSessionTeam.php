@@ -2,6 +2,7 @@
 
 namespace App\Actions\Teams;
 
+use App\Concerns\TeamSessionKeys;
 use App\Models\Team;
 
 class CreateCurrentSessionTeam
@@ -14,9 +15,9 @@ class CreateCurrentSessionTeam
     public function handle(Team $team): void
     {
         session([
-            'current_team_id'   => (string) $team->id,
-            'current_team_name' => (string) $team->name,
-            'current_team'      => $team,
+            TeamSessionKeys::CURRENT_TEAM_ID->key()   => (string) $team->id,
+            TeamSessionKeys::CURRENT_TEAM_NAME->key() => (string) $team->name,
+            TeamSessionKeys::CURRENT_TEAM->key()      => $team,
         ]);
 
     }

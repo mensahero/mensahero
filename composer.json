@@ -44,7 +44,8 @@
         "socialiteproviders/zoho": "^4.1",
         "socialiteproviders/zoom": "^4.0",
         "stevebauman/location": "^7.6",
-        "tightenco/ziggy": "^2.6"
+        "tightenco/ziggy": "^2.6",
+        "wildside/userstamps": "^3.1"
     },
     "require-dev": {
         "driftingly/rector-laravel": "^2.0",
