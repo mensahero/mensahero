@@ -141,14 +141,13 @@ class Team extends Model
     /**
      * Accept the given user invitation for the team.
      *
-     * @param $email
-     * @param $role
-     *
-     * @throws Exception
+     * @param string $email
+     * @param string $role
      *
      * @return void
+     * @throws Exception
      */
-    public function acceptInvitation($email, $role): void
+    public function acceptInvitation(string $email, string $role): void
     {
         resolve(AddTeamMember::class)->handle($this, $email, $role);
     }

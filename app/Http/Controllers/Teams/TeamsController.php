@@ -148,8 +148,8 @@ class TeamsController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param string  $id
+     * @param UpdateTeamNameRequest $request
+     * @param string                $id
      *
      * @throws Exception
      *
@@ -187,7 +187,7 @@ class TeamsController extends Controller
             $team->owner->ownedTeams()->update(['default' => false]);
         }
 
-        $team->default = $request->boolean('default');
+        $team->default = $request->default;
         $team->save();
 
         broadcast(new UpdatedEvent($team))->toOthers();
@@ -258,8 +258,8 @@ class TeamsController extends Controller
     }
 
     /**
-     * @param Request $request
-     * @param string  $id
+     * @param UpdateTeamMemberRoleRequest $request
+     * @param string                      $id
      *
      * @throws Exception
      *

@@ -98,7 +98,7 @@ class TeamInvitationController extends Controller
 
     }
 
-    public function resendInvitation(Request $request, string $id)
+    public function resendInvitation(Request $request, string $id): RedirectResponse
     {
         $team = resolve(RetrieveCurrentSessionTeam::class)->handle();
         if (! $request->user()->hasTeamPermission($team, 'team:invite')) {

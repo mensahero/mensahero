@@ -38,14 +38,13 @@ class AddTeamMember
     /**
      * Get the validation rules for adding a team member.
      *
-     * @return array<string, Rule|array|string>
      */
     protected function rules(): array
     {
-        return array_filter([
+        return [
             'email' => ['required', 'email', 'exists:users'],
             'role'  => ['required', 'string', 'exists:roles,id'],
-        ]);
+        ];
     }
 
     /**

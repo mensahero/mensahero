@@ -77,8 +77,9 @@ trait HasTeams
         return $this->hasMany(Team::class);
     }
 
+
     /**
-     * @return BelongsToMany<Team, $this, Pivot>
+     * @return BelongsToMany
      */
     public function teams(): BelongsToMany
     {
