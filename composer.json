@@ -145,18 +145,6 @@
             "Composer\\Config::disableProcessTimeout",
             "vendor/bin/phpstan analyse --memory-limit=2G --ansi"
         ],
-        "playwright:install": [
-            "echo Installing Playwright.",
-            "bun install playwright@latest",
-            "bunx --bun playwright install"
-        ],
-        "playwright:cleanup": [
-            "echo Cleaning up Playwright.",
-            "bunx --bun playwright uninstall --all"
-        ],
-        "test:browser": [
-            "php artisan test --testsuite=Browser --bail"
-        ],
         "test:features": [
             "php artisan test --testsuite=Feature --bail"
         ],
@@ -166,8 +154,7 @@
         "test": [
             "@php artisan config:clear --ansi",
             "@test:api",
-            "@test:features",
-            "@test:browser"
+            "@test:features"
         ],
         "pre-commit": [
             "@rector",
@@ -181,9 +168,6 @@
         "setup": "Setup the project by installing all the dependencies and running the db migrations",
         "dev": "Run the development server",
         "dev:ssr": "Run the development server with SSR",
-        "playwright:install": "Install Playwright",
-        "playwright:cleanup": "Cleanup Playwright",
-        "test:browser": "Run the browser tests",
         "test:features": "Run the feature tests",
         "test:api": "Run the API tests",
         "test": "Run the whole suite tests",
