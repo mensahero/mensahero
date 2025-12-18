@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Concerns\InertiaNotificationType;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 final class InertiaNotification
 {
@@ -110,7 +111,7 @@ final class InertiaNotification
             throw new Exception('Notification message is required.');
         }
 
-        $this->request->session()->flash($this->key, [
+        Inertia::flash($this->key, [
             'type'    => $this->type,
             'icon'    => $this->icon,
             'color'   => $this->color,

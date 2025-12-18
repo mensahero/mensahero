@@ -1,4 +1,3 @@
-import { Notification } from '@/types/notification'
 import { User } from '@/types/user'
 
 export interface Auth {
@@ -21,5 +20,4 @@ export type AppPageProps<T extends Record<string, unknown> = Record<string, unkn
     auth: Auth
     csrf_token: string
     theme: Theme & UiColors
-    notification?: Notification
 }
