@@ -1,4 +1,3 @@
-import { Notification } from '@/types/notification'
 import { User } from '@/types/user'
 
 export interface Auth {

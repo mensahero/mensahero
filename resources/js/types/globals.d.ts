@@ -1,6 +1,6 @@
 import { AppPageProps } from '@/types/index'
-import type { route as routeFn } from 'ziggy-js'
 import { Notification } from '@/types/notification'
+import type { route as routeFn } from 'ziggy-js'
 
 declare global {
     const route: typeof routeFn
