@@ -3,11 +3,13 @@
 namespace App\Models;
 
 use App\Concerns\ProviderConnectionType;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Crypt;
 
 class Providers extends Model
 {
@@ -31,11 +33,34 @@ class Providers extends Model
     ];
 
     protected $hidden = [
+        'client_secret',
         'refresh_token',
         'access_token',
     ];
 
-    // TODO: Add a mutator/accessor for safe guarding of the token
+    protected function client_secret(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, array $attributes) => Crypt::encryptString($value),
+            set: fn ($value) => Crypt::decryptString($value),
+        );
+    }
+
+    protected function refresh_token(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, array $attributes) => Crypt::encryptString($value),
+            set: fn ($value) =>  Crypt::decryptString($value),
+        );
+    }
+
+    protected function access_token(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value, array $attributes) => Crypt::encryptString($value),
+            set: fn ($value) =>  Crypt::decryptString($value),
+        );
+    }
 
     protected function casts(): array
     {

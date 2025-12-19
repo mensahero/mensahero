@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('providers', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('connection_type');
             $table->string('scope')->nullable();
             $table->string('client_id')->nullable();
