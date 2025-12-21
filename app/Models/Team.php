@@ -57,6 +57,16 @@ class Team extends Model
     }
 
     /**
+     * Get the shared Gateways be the team users
+     *
+     * @return HasMany
+     */
+    public function gateways(): HasMany
+    {
+        return $this->hasMany(Gateway::class, 'team_id');
+    }
+
+    /**
      * Get all of the team's users including its owner.
      *
      * @return Collection

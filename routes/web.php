@@ -14,4 +14,5 @@ require __DIR__.'/settings/password.php';
 require __DIR__.'/settings/2fa.php';
 require __DIR__.'/settings/sessions.php';
 require __DIR__.'/modules/contacts.php';
+require __DIR__.'/modules/devices.php';
 require __DIR__.'/teams/teams.php';

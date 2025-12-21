@@ -5,8 +5,24 @@ import { computed } from 'vue'
 const sidebarNavigationItems = computed<NavigationMenuItem[][]>(() => [
     [
         {
+            label: 'MAIN MENU',
+            type: 'label',
+        },
+        {
             label: 'Home',
             icon: 'i-lucide-house',
+            to: route('dashboard', {}, false),
+            target: '_self',
+        },
+        {
+            label: 'Devices',
+            icon: 'heroicons:cpu-chip',
+            to: route('devices.index', {}, false),
+            target: '_self',
+        },
+        {
+            label: 'Gateway',
+            icon: 'carbon:gateway-api',
             to: route('dashboard', {}, false),
             target: '_self',
         },
