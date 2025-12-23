@@ -69,4 +69,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Contacts::class);
     }
+
+    public function gateways(): HasMany
+    {
+        return $this->hasMany(Gateway::class, 'user_id');
+    }
+
+    public function devices(): HasMany
+    {
+        return $this->hasMany(Devices::class, 'user_id');
+    }
 }
