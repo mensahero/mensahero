@@ -27,16 +27,25 @@ class Gateway extends Model
         'team_id',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return BelongsTo<Devices, $this>
+     */
     public function devices(): BelongsTo
     {
         return $this->belongsTo(Devices::class, 'device_provider');
     }
 
+    /**
+     * @return BelongsTo<Providers, $this>
+     */
     public function providers(): BelongsTo
     {
         return $this->belongsTo(Providers::class, 'device_provider');

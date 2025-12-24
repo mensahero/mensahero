@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\Modules\Devices;
 
 use App\Http\Resources\Api\Auth\SessionUserResource;
+use App\Http\Resources\GatewayResource;
 use App\Models\Devices;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -33,7 +34,8 @@ class DevicesResource extends JsonResource
 
             'user_id' => $this->user_id,
 
-            'user' => new SessionUserResource($this->whenLoaded('user')),
+            'gateways' => GatewayResource::collection($this->whenLoaded('gateways')),
+            'user'     => new SessionUserResource($this->whenLoaded('user')),
         ];
     }
 }

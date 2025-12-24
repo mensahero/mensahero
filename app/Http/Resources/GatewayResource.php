@@ -6,6 +6,7 @@ use App\Http\Resources\Api\Auth\SessionUserResource;
 use App\Models\Gateway;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Override;
 
 /** @mixin Gateway */
 class GatewayResource extends JsonResource
@@ -15,6 +16,7 @@ class GatewayResource extends JsonResource
      *
      * @return array
      */
+    #[Override]
     public function toArray(Request $request): array
     {
         return [

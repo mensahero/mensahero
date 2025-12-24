@@ -59,7 +59,7 @@ class Team extends Model
     /**
      * Get the shared Gateways be the team users
      *
-     * @return HasMany
+     * @return HasMany<Gateway, $this>
      */
     public function gateways(): HasMany
     {

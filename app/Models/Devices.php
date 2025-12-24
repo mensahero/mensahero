@@ -33,11 +33,17 @@ class Devices extends Model
         'extras',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasMany<Gateway, $this>
+     */
     public function gateways(): HasMany
     {
         return $this->hasMany(Gateway::class, 'device_provider');
