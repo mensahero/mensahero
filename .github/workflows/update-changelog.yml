@@ -1,4 +1,4 @@
-name: "Update Changelog"
+name: "Update Changelog & App Version"
 
 on:
   release:
@@ -14,16 +14,24 @@ jobs:
         with:
           ref: main
 
-      - name: Update Changelog
+      - name: Update CHANGELOG
         uses: stefanzweifel/changelog-updater-action@v1
         with:
           latest-version: ${{ github.event.release.name }}
           release-notes: ${{ github.event.release.body }}
 
-#     uncomment this if you want to commit the changes to the repository
-      - name: Commit updated CHANGELOG
+      - name: Update composer.json version
+        run: |
+          VERSION="${{ github.event.release.tag_name }}"
+          VERSION="${VERSION#v}" # removes leading v if present
+          jq --arg v "$VERSION" '.version = $v' composer.json > composer.tmp.json
+          mv composer.tmp.json composer.json
+
+      - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
           branch: main
-          commit_message: Update CHANGELOG
-          file_pattern: CHANGELOG.md
+          commit_message: "chore: update changelog and version to ${{ github.event.release.tag_name }}"
+          file_pattern: |
+            CHANGELOG.md
+            composer.json

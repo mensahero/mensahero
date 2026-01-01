@@ -1,25 +1,26 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "marjose123/laravel-nuxtui-starter-kit",
+    "name": "mensahero/mensahero",
+    "version": "0.0.1",
     "type": "project",
-    "description": "The starter kit application for the Laravel framework that utilizes Vue, NuxtUi, TailwindCss, and other Laravel packages.",
+    "description": "A self-hosted SMS Gateway",
     "keywords": [
-        "laravel",
-        "framework",
-        "starter-kit",
-        "nuxtui-laravel",
-        "laravel-nuxtui-starter-kit",
-        "laravel nuxt-ui"
+        "SMS Gateway",
+        "Self-hosted",
+        "Offline SMS",
+        "Laravel built SMS Gateway"
     ],
     "license": "MIT",
     "support": {
-        "issues": "https://github.com/marjose123/laravel-nuxtui-starter-kit/issues",
-        "source": "https://github.com/marjose123/laravel-nuxtui-starter-kit"
+        "issues": "https://github.com/mensahero/mensahero/issues",
+        "source": "https://github.com/mensahero/mensahero"
     },
     "authors": [
         {
             "name": "MarJose Darang",
-            "email": "hypernate1@gmail.com"
+            "email": "hypernate1@gmail.com",
+            "role": "Author",
+            "homepage": "https://github.com/MarJose123"
         }
     ],
     "require": {
